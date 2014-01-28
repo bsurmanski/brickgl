@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include "matrix.hpp"
 #include "brick.h"
 #include "GL/gl.h"
 #include "GL/glext.h"
