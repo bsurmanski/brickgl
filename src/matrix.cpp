@@ -252,6 +252,12 @@ mat4 mat4::transposed()
     return m;
 }
 
+void mat4::translate(vec4 off)
+{
+    mat4 tmp = getTranslation(off); 
+    *this = tmp * *this;
+}
+
 vec4 mat4::x()
 {
     return vec4(v[XX], v[XY], v[XZ], v[XW]);

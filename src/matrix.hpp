@@ -52,6 +52,7 @@ class mat4
     mat4 transposed();
     void normalize();
     mat4 normalized();
+    void translate(vec4 off);
 
     vec4 x();
     vec4 y();
