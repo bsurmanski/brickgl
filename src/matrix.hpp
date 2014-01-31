@@ -53,12 +53,14 @@ class mat4
     void normalize();
     mat4 normalized();
     void translate(vec4 off);
+    float *ptr() { return v; }
 
     vec4 x();
     vec4 y();
     vec4 z();
     vec4 w();
 
+    void print();
 };
 
 #endif

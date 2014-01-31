@@ -16,7 +16,9 @@ src/framework/application.cpp
 GLSL=src/glsl/default.fs\
 	 src/glsl/default.vs\
 	 src/glsl/test.fs\
-	 src/glsl/test.vs
+	 src/glsl/test.vs\
+	 src/glsl/cube.fs\
+	 src/glsl/cube.vs
 
 GLSLH = $(patsubst %.vs,%.vs.h,$(patsubst %.fs,%.fs.h,$(GLSL)))
 

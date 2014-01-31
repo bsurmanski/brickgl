@@ -7,6 +7,7 @@
 
 class DrawDevice : public Device
 {
+    public: //TODO: private
     mat4 mMatrix;
     mat4 vMatrix;
     mat4 pMatrix;

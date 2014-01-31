@@ -1,5 +1,6 @@
 #include "matrix.hpp"
 
+#include <stdio.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -128,7 +129,7 @@ mat4 mat4::getFrustum(float l, float r, float b, float t, float n, float f)
     m.v[XZ] = 0.0f;
     m.v[YZ] = 0.0f;
     m.v[ZZ] = -(f + n) / (f - n);
-    m.v[WZ] = -(f * n) / (f - n);
+    m.v[WZ] = -(2.0f  * f * n) / (f - n);
 
     m.v[XW] = 0.0f;
     m.v[YW] = 0.0f;
@@ -276,4 +277,12 @@ vec4 mat4::z()
 vec4 mat4::w()
 {
     return vec4(v[WX], v[WY], v[WZ], v[WW]);
+}
+
+void mat4::print()
+{
+    printf("%f, %f, %f, %f\n", v[XX], v[YX], v[ZX], v[WX]);
+    printf("%f, %f, %f, %f\n", v[XY], v[YY], v[ZY], v[WY]);
+    printf("%f, %f, %f, %f\n", v[XZ], v[YZ], v[ZZ], v[WZ]);
+    printf("%f, %f, %f, %f\n", v[XW], v[YW], v[ZW], v[WW]);
 }
