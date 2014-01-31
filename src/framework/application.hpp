@@ -6,6 +6,7 @@
 
 class Application
 {
+    public:
     Window *window;
     DrawDevice *drawDevice;
     

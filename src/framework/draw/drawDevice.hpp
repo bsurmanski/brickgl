@@ -3,6 +3,7 @@
 
 #include "../../matrix.hpp"
 #include "../device.hpp"
+#include "drawProgram.hpp"
 
 class DrawDevice : public Device
 {
@@ -14,6 +15,7 @@ class DrawDevice : public Device
     DrawDevice();
     virtual ~DrawDevice();
     virtual void update(float dt); 
+    virtual DrawProgram *createProgram() = 0;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <GL/glext.h>
 
 #include "drawDevice.hpp"
+#include "glDrawProgram.hpp"
 
 class GLDrawDevice : public DrawDevice
 {
@@ -14,6 +15,7 @@ class GLDrawDevice : public DrawDevice
     public:
     GLDrawDevice();
     virtual ~GLDrawDevice();
+    virtual DrawProgram *createProgram();
 };
 
 #endif

@@ -26,3 +26,8 @@ GLDrawDevice::~GLDrawDevice()
 {
     this->~DrawDevice();
 }
+
+DrawProgram *GLDrawDevice::createProgram()
+{
+    return new GLDrawProgram;
+}

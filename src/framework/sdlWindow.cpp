@@ -8,6 +8,7 @@ SDLWindow::SDLWindow(uint32_t w, uint32_t h, std::string name) : Window(w, h, na
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     screen = SDL_SetVideoMode(w, h, 32, SDL_OPENGL);
+    SDL_WM_SetCaption(name.c_str(), 0);
 }
 
 SDLWindow::~SDLWindow()

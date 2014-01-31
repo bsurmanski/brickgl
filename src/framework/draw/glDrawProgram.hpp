@@ -6,6 +6,7 @@
 
 class GLDrawProgram : public DrawProgram
 {
+    public: //TODO: shouldnt be public?
     GLuint id; 
     GLDrawShader *shaders[5];
 

@@ -3,24 +3,29 @@
 #include <iostream>
 #include <assert.h>
 
+GLDrawShader::GLDrawShader(unsigned stage)
+{
+    id = glCreateShader(stage);
+}
+
 GLDrawShader *GLDrawShader::fromString(unsigned stage, const char *str, int len)
 {
-    GLDrawShader *dshader = new GLDrawShader;
+    GLDrawShader *shader = new GLDrawShader(stage);
 
-    GLuint sh = glCreateShader(stage);
-    glShaderSource(sh, 1, &str, &len);
+    glShaderSource(shader->id, 1, &str, NULL);
+    glCompileShader(shader->id);
+
     GLint cstatus;
-    glGetShaderiv(sh, GL_COMPILE_STATUS, &cstatus);
+    glGetShaderiv(shader->id, GL_COMPILE_STATUS, &cstatus);
     if(cstatus == GL_FALSE)
     {
         char buf[512];
-        glGetShaderInfoLog(sh, 512, 0, buf);
-        std::cout << buf; 
+        glGetShaderInfoLog(shader->id, 512, 0, buf);
+        std::cout << buf << std::endl; 
         assert(false); //TODO: handle error
     }
 
-    dshader->id = sh;
-    return dshader;
+    return shader;
 }
 
 GLDrawShader *GLDrawShader::fromFile(unsigned stage, const char *filenm)

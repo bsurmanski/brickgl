@@ -14,6 +14,7 @@ class GLDrawShader
 {
     GLuint id;
 
+    public:
     enum
     {
         GEOMETRY_SHADER = GL_GEOMETRY_SHADER, 
@@ -21,7 +22,8 @@ class GLDrawShader
         FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
     };
 
-    public:
+        GLDrawShader(unsigned stage);
+
         static GLDrawShader *fromString(unsigned stage, const char *str, int len = 0);
         static GLDrawShader *fromFile(unsigned stage, const char *filenm);
         friend class GLDrawProgram;

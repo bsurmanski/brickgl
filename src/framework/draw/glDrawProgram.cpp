@@ -1,5 +1,18 @@
 #include "glDrawProgram.hpp"
 
+#include <string.h>
+
+GLDrawProgram::GLDrawProgram()
+{
+    id = glCreateProgram();
+    memset(shaders, 0, sizeof(GLDrawShader*[5]));
+}
+
+GLDrawProgram::~GLDrawProgram()
+{
+
+}
+
 void GLDrawProgram::clean()
 {
     for(int i = 0; i < 5; i++)
@@ -21,5 +34,5 @@ void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
     }
 
     shaders[stage] = program;
-    clean();
+    //clean();
 }

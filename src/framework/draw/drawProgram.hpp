@@ -3,6 +3,7 @@
 
 class DrawProgram
 {
+    protected:
     virtual ~DrawProgram(){}     
 };
 
