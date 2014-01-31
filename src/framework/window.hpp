@@ -4,11 +4,15 @@
 #include <stdint.h>
 #include <string>
 
+#include "draw/drawDevice.hpp"
+
 class Window
 {
     uint32_t width;
     uint32_t height;
     std::string name;
+
+    DrawDevice *draw;
 
     public:
     Window(uint32_t w, uint32_t h, std::string name);

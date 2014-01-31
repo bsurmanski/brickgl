@@ -7,14 +7,27 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
 #include <SDL/SDL.h>
 
+#define GL_GLEXT_PROTOTYPES
+
+#include <GL/gl.h>
+#include <GL/glext.h>
+
+#include "framework/application.hpp"
+#include "framework/draw/glDrawDevice.hpp"
 #include "framework/sdlWindow.hpp"
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "brick.h"
+
+class MainApplication : public Application
+{
+    MainApplication() : Application(new SDLWindow(640, 480, "MainApp"), new GLDrawDevice())
+    {
+             
+    }
+};
 
 bool running = true;
 mat4 mat4_perspective;
@@ -38,12 +51,6 @@ void init()
     mat4_view = mat4::getIdentity();
     mat4_view.translate(vec4(0.0f, 0.0f, -10.0f));
     //glEnable(GL_DEPTH_TEST);
-
-    programptr = glCreateProgram();
-
-    glGenBuffers(1, &cubeptr); 
-    glBindBuffer(GL_ARRAY_BUFFER, cubeptr);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 }
 
 void destroy()

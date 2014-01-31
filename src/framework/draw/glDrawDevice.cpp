@@ -1,5 +1,15 @@
 #include "glDrawDevice.hpp"
 
+#include <stdint.h>
+
+static float fsquad_verts[] = {
+    -1, -1, 0,
+    1, -1, 0,
+    1, 1, 0,
+    -1, 1, 0
+};
+static unsigned short fsquad_faces[] = {0, 1, 2, 0, 2, 3};
+
 GLDrawDevice::GLDrawDevice()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

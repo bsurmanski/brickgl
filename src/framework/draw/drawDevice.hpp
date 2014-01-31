@@ -1,9 +1,10 @@
 #ifndef _DRAWDEVICE_HPP
 #define _DRAWDEVICE_HPP
 
-#include "../matrix.hpp"
+#include "../../matrix.hpp"
+#include "../device.hpp"
 
-class DrawDevice
+class DrawDevice : public Device
 {
     mat4 mMatrix;
     mat4 vMatrix;
@@ -12,7 +13,7 @@ class DrawDevice
     public:
     DrawDevice();
     virtual ~DrawDevice();
-    
+    virtual void update(float dt); 
 };
 
 #endif
