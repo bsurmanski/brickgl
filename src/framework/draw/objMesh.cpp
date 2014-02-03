@@ -53,8 +53,8 @@ Mesh *loadObjMesh(std::string filenm)
         {
             int f[4];
             fscanf(file, "f %i %i %i %i", &f[0], &f[1], &f[2], &f[3]);
-            faces.push_back(MeshFace(f[0], f[1], f[2]));
-            faces.push_back(MeshFace(f[0], f[2], f[3]));
+            faces.push_back(MeshFace(f[0] - 1, f[1] - 1, f[2] - 1)); // -1 because OBJ starts indexing at 1. we want 0
+            faces.push_back(MeshFace(f[0] - 1, f[2] - 1, f[3] - 1));
         } else if(c == 'm')
         {
             //mtllib

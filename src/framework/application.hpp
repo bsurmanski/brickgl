@@ -11,6 +11,7 @@ class Application
     DrawDevice *drawDevice;
     
     public:
+    Application(){}
     Application(Window *window, DrawDevice *ddev);
     virtual ~Application();
 };
