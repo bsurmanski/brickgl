@@ -17,5 +17,5 @@ void main()
     gl_Position = mvpMatrix * vec4(position, 1.0f);
     fnormal = mvpMatrix * vec4(normal, 0.0f);
     fuv = uv;
-    color = vec4(uv, 1.0f, 1.0f);
+    color = vec4(position, 1.0f);
 }

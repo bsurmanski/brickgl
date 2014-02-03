@@ -36,3 +36,8 @@ void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
     shaders[stage] = program;
     //clean();
 }
+
+void GLDrawProgram::use()
+{
+    glUseProgram(id);
+}

@@ -16,6 +16,7 @@ class GLDrawProgram : public DrawProgram
     GLDrawProgram();
     virtual ~GLDrawProgram();
     void bindStage(int stage, GLDrawShader *program);
+    void use();
 };
 
 #endif

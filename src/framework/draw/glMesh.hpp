@@ -8,11 +8,18 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-class GLMesh : public Mesh
+class GLMesh
 {
-    GLuint ibuffer;
     GLuint vbuffer;
+    GLuint ibuffer;
     GLuint vao;
+
+    unsigned nelem;
+
+    public:
+
+    GLMesh(Mesh &m);
+    unsigned getNElements() { return nelem; }
 
     virtual ~GLMesh(){}
 };
