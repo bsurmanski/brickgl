@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <math.h>
 #include <SDL/SDL.h>
 
 #define GL_GLEXT_PROTOTYPES
@@ -155,10 +156,13 @@ class MainApplication : public Application
     void draw()
     {
 
-        static float angle = 0.0f;
+        static float angle = 0.5f;
         angle += 0.05f;
-        mat4 mMatrix = mat4::getRotation(angle, vec4(1, 1, 0, 0));
-        mat4 vMatrix = mat4::getTranslation(vec4(0, 0, - 10));
+        //mat4 mMatrix = mat4::getRotation(vec4(angle, angle, 0, 0));
+        mat4 mMatrix = mat4::getRotation(angle, vec4(0.5, 0.5, 0, 0));
+        mMatrix.print();
+        printf("\n");
+        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 10));
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 

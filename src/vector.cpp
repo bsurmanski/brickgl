@@ -1,6 +1,6 @@
 #include "vector.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <string.h>
 
 vec4::vec4()
@@ -85,7 +85,9 @@ float vec4::dot(vec4 &v)
 
 float vec4::length()
 {
-    sqrt(lengthSq());
+    float lensq = lengthSq();
+    float len = sqrt(lensq);
+    return len;
 }
 
 float vec4::lengthSq()

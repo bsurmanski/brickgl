@@ -188,13 +188,17 @@ mat4 mat4::getRotation(float angle, vec4 r)
     m.v[XX] = t * r.x * r.x + c;
     m.v[YX] = t * r.x * r.y - s * r.z;
     m.v[ZX] = t * r.x * r.z + s * r.y;
+
     m.v[WX] = m.v[WY] = m.v[WZ] = 0.0f;
-    m.v[XY] = t * r.x * r.y * s * r.z;
-    m.v[YY] = t * r.y * r.y + c;
+
+    m.v[XY] = t * r.x * r.y + s * r.z;
+    m.v[YY] = t * r.y * r.y + c; 
     m.v[ZY] = t * r.y * r.z - s * r.x;
+
     m.v[XZ] = t * r.x * r.z - s * r.y;
     m.v[YZ] = t * r.y * r.z + s * r.x;
     m.v[ZZ] = t * r.z * r.z + c;
+
     m.v[XW] = m.v[YW] = m.v[ZW] = 0.0f;
     m.v[WW] = 1.0f;
 

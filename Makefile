@@ -26,7 +26,7 @@ GLSL=src/glsl/default.fs\
 GLSLH = $(patsubst %.vs,%.vs.h,$(patsubst %.fs,%.fs.h,$(GLSL)))
 
 CFLAGS= -g -std=gnu++11
-LDFLAGS= -lSDL -lGL
+LDFLAGS= -lSDL -lGL -lm -lc
 
 %.fs.h: %.fs
 	(cat $<; printf "\0") | xxd -i > $@
