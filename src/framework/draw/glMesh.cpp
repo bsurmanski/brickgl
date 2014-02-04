@@ -8,8 +8,8 @@
 struct IVertex
 {
     unsigned v;
-    unsigned u;
     unsigned n;
+    unsigned u;
 };
 
 struct GLVertex

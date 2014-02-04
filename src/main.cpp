@@ -175,11 +175,11 @@ class MainApplication : public Application
         GLuint norm_uint = glGetAttribLocation(mainProgram->id, "normal");
         GLuint uv_uint = glGetAttribLocation(mainProgram->id, "uv");
         glEnableVertexAttribArray(pos_uint);
-        //glEnableVertexAttribArray(norm_uint);
-        //glEnableVertexAttribArray(uv_uint);
+        glEnableVertexAttribArray(norm_uint);
+        glEnableVertexAttribArray(uv_uint);
         glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 24, 0);
-        //glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, sizeof(VERTEX), (void*) 12);
-        //glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, sizeof(VERTEX), (void*) 18);
+        glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, 24, (void*) 12);
+        glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, 24, (void*) 18);
         glDrawElements(GL_TRIANGLES, cube->getNElements(), GL_UNSIGNED_SHORT, 0);
     }
 
