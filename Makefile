@@ -25,7 +25,7 @@ GLSL=src/glsl/default.fs\
 
 GLSLH = $(patsubst %.vs,%.vs.h,$(patsubst %.fs,%.fs.h,$(GLSL)))
 
-CFLAGS= -g -std=gnu++11
+CFLAGS= -g -std=gnu++11 -Wno-narrowing
 LDFLAGS= -lSDL -lGL -lm -lc
 
 %.fs.h: %.fs

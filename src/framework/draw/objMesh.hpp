@@ -5,6 +5,6 @@
 #include<string>
 #include "mesh.hpp"
 
-Mesh *loadObjMesh(std::string filenm);
+Mesh loadObjMesh(std::string filenm);
 
 #endif

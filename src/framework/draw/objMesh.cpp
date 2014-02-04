@@ -1,5 +1,7 @@
 #include "objMesh.hpp"
 #include "mesh.hpp"
+
+#include <stdint.h>
 #include <stdio.h>
 
 using namespace std;
@@ -16,11 +18,12 @@ void fdropline(FILE *file)
     while(fgetc(file) != '\n');
 }
 
-Mesh *loadObjMesh(std::string filenm)
+Mesh loadObjMesh(std::string filenm)
 {
     FILE *file = fopen(filenm.c_str(), "r");
-    vector<MeshVertex> verts;
-    vector<MeshFace> faces;
+    Mesh m;
+
+    if(!file) return m;
 
     while(!feof(file))
     {
@@ -47,14 +50,45 @@ Mesh *loadObjMesh(std::string filenm)
         } else if(c == 'v')
         {
             float v[3];
-            fscanf(file, "v %f %f %f", &v[0], &v[1], &v[2]);
-            verts.push_back(MeshVertex(v[0], v[1], v[2]));
+            fgetc(file); // ignore v
+            if(fpeek(file) == 't') // uv
+            {
+                fscanf(file, "t %f %f", &v[0], &v[1]);
+                m.uvs.push_back(MeshUv(v[0], v[1]));
+                continue;
+            } else if(fpeek(file) == 'n')
+            {
+
+                fscanf(file, "n %f %f %f", &v[0], &v[1], &v[2]);
+                m.norms.push_back(MeshNormal(v[0], v[1], v[2]));
+                continue;
+            }
+
+            fscanf(file, " %f %f %f", &v[0], &v[1], &v[2]);
+            m.verts.push_back(MeshPosition(v[0], v[1], v[2]));
         } else if(c == 'f')
         {
-            int f[4];
-            fscanf(file, "f %i %i %i %i", &f[0], &f[1], &f[2], &f[3]);
-            faces.push_back(MeshFace(f[0] - 1, f[1] - 1, f[2] - 1)); // -1 because OBJ starts indexing at 1. we want 0
-            faces.push_back(MeshFace(f[0] - 1, f[2] - 1, f[3] - 1));
+            uint16_t vi[4];
+            uint16_t ni[4];
+            uint16_t ui[4];
+
+            fscanf(file, "f %hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu", 
+                    &vi[0], &ui[0], &ni[0],
+                    &vi[1], &ui[1], &ni[1],
+                    &vi[2], &ui[2], &ni[2],
+                    &vi[3], &ui[3], &ni[3]);
+
+            MeshFace face1 = { vi[0] - 1, vi[1] - 1, vi[2] - 1,
+                                ni[0] - 1, ni[1] - 1, ni[2] - 1,
+                                ui[0] - 1, ui[1] - 1, ui[2] - 1};
+
+            MeshFace face2 = { vi[0] - 1, vi[2] - 1, vi[3] - 1,
+                                ni[0] - 1, ni[2] - 1, ni[3] - 1,
+                                ui[0] - 1, ui[2] - 1, ui[3] - 1};
+
+
+            m.faces.push_back(face1);
+            m.faces.push_back(face2);
         } else if(c == 'm')
         {
             //mtllib
@@ -66,5 +100,5 @@ Mesh *loadObjMesh(std::string filenm)
         }
     }
 
-    return new Mesh(verts, faces);
+    return m;
 }
