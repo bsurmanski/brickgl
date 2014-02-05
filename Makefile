@@ -13,7 +13,7 @@ src/framework/draw/drawDevice.cpp\
 src/framework/draw/glDrawProgram.cpp\
 src/framework/draw/mesh.cpp\
 src/framework/draw/glMesh.cpp\
-src/framework/draw/objMesh.cpp\
+src/framework/draw/objFormat.cpp\
 src/framework/application.cpp
 
 GLSL=src/glsl/default.fs\

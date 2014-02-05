@@ -225,6 +225,11 @@ mat4 mat4::getScale(vec4 s)
     return m;
 }
 
+mat4 mat4::getScale(float f)
+{
+    return getScale(vec4(f, f, f, 1.0f));
+}
+
 void mat4::transpose()
 {
     *this = transposed();
@@ -260,6 +265,18 @@ mat4 mat4::transposed()
 void mat4::translate(vec4 off)
 {
     mat4 tmp = getTranslation(off); 
+    *this = tmp * *this;
+}
+
+void mat4::scale(vec4 s)
+{
+    mat4 tmp = getScale(s); 
+    *this = tmp * *this;
+}
+
+void mat4::scale(float f)
+{
+    mat4 tmp = getScale(vec4(f, f, f, 1.0f)); 
     *this = tmp * *this;
 }
 

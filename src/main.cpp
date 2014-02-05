@@ -25,56 +25,9 @@
 
 #include "framework/draw/mesh.hpp"
 #include "framework/draw/glMesh.hpp"
-#include "framework/draw/objMesh.hpp"
+#include "framework/draw/objFormat.hpp"
 
 GLMesh *cube;
-/*
-
-struct VERTEX 
-{
-    float pos[3];
-    short normal[3];
-    unsigned short uv[2];
-};
-
-VERTEX quad[] =
-{
-    {{-1.0f, -1.0f, 0.0f}, {0, 0, SHRT_MAX}, {0, 0}},
-    {{1.0f, -1.0f, 0.0f}, {0, 0, SHRT_MAX}, {USHRT_MAX, 0}},
-    {{1.0f, 1.0f, 0.0f}, {0, 0, SHRT_MAX}, {USHRT_MAX, USHRT_MAX}},
-    {{-1.0f, 1.0f, 0.0f}, {0, 0, SHRT_MAX}, {0, USHRT_MAX}},
-
-    {{-1.0f, -1.0f, 1.0f}, {0, 0, SHRT_MIN}, {0, 0}},
-    {{1.0f, -1.0f, 1.0f}, {0, 0, SHRT_MIN}, {USHRT_MAX, 0}},
-    {{1.0f, 1.0f, 1.0f}, {0, 0, SHRT_MIN}, {USHRT_MAX, USHRT_MAX}},
-    {{-1.0f, 1.0f, 1.0f}, {0, 0, SHRT_MIN}, {0, USHRT_MAX}},
-};
-
-
-unsigned short iquad[] =
-{
-    0,1,2,
-    0,2,3,
-
-    6,5,4,
-    7,6,4,
-
-    0,1,5,
-    0,5,4,
-
-    1,2,6,
-    1,6,5,
-
-    3,0,4,
-    3,4,7,
-
-    2,3,7,
-    2,7,6
-};
-
-int nquad = 8;
-*/
-int niquad = 36;
 
 class MainApplication : public Application
 {
@@ -89,7 +42,7 @@ class MainApplication : public Application
         drawDevice = new GLDrawDevice();
         isRunning = true;
 
-        Mesh mesh = loadObjMesh("res/cube.obj");
+        Mesh mesh = objLoad("res/1x1.obj");
         cube = new GLMesh(mesh); //TODO mesh manager
 
         mainProgram = (GLDrawProgram*) drawDevice->createProgram();
@@ -115,19 +68,6 @@ class MainApplication : public Application
         mainProgram->bindStage(1, testfs);
         mainProgram->clean();
         mainProgram->use();
-
-        /*
-        //TEMP
-        GLuint quadptr;
-        glGenBuffers(1, &quadptr);
-        glBindBuffer(GL_ARRAY_BUFFER, quadptr);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(VERTEX[nquad]), quad, GL_STATIC_DRAW);
-
-        GLuint iquadptr;
-        glGenBuffers(1, &iquadptr);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iquadptr);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short[niquad]), iquad, GL_STATIC_DRAW);
-        */
     }
 
     ~MainApplication()
@@ -158,10 +98,8 @@ class MainApplication : public Application
         static float angle = 0.5f;
         angle += 0.05f;
         //mat4 mMatrix = mat4::getRotation(vec4(angle, angle, 0, 0));
-        mat4 mMatrix = mat4::getRotation(angle, vec4(0.5, 0.5, 0, 0));
-        mMatrix.print();
-        printf("\n");
-        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 10));
+        mat4 mMatrix = mat4::getRotation(angle, vec4(1, 1, 0, 0));
+        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 100));
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 

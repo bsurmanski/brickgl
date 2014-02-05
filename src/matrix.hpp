@@ -35,6 +35,7 @@ class mat4
     static mat4 getRotation(float angle, vec4 r);
     static mat4 getTranslation(vec4 v); // ignores v.w
     static mat4 getScale(vec4 s);
+    static mat4 getScale(float f);
 
     mat4(){}
 
@@ -53,6 +54,8 @@ class mat4
     void normalize();
     mat4 normalized();
     void translate(vec4 off);
+    void scale(vec4 s);
+    void scale(float f);
     float *ptr() { return v; }
 
     vec4 x();
