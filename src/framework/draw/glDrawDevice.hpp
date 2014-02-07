@@ -7,15 +7,20 @@
 #include <GL/glext.h>
 
 #include "drawDevice.hpp"
+#include "glFramebuffer.hpp"
 #include "glDrawProgram.hpp"
+#include "glTexture.hpp"
 
 class GLDrawDevice : public DrawDevice
 {
+    GLDrawProgram *deferred;
 
     public:
     GLDrawDevice();
     virtual ~GLDrawDevice();
     virtual DrawProgram *createProgram();
+    virtual void bindTexture(unsigned unit, GLTexture *tex){}
+    virtual void drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth);
 };
 
 #endif

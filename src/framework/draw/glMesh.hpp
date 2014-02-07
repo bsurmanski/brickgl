@@ -10,6 +10,7 @@
 
 class GLMesh
 {
+    public:
     GLuint vbuffer;
     GLuint ibuffer;
     GLuint vao;
