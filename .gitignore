@@ -17,4 +17,7 @@
 *.out
 *.app
 
+*.vs.h
+*.fs.h
+
 brickgl
