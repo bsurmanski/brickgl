@@ -26,8 +26,12 @@
 #include "framework/draw/mesh.hpp"
 #include "framework/draw/glMesh.hpp"
 #include "framework/draw/objFormat.hpp"
+#include "framework/draw/pngFormat.hpp"
+
+#include <assert.h>
 
 GLMesh *cube;
+GLTexture *cubetex;
 
 class MainApplication : public Application
 {
@@ -45,6 +49,9 @@ class MainApplication : public Application
 
         Mesh mesh = objLoad("res/1x1.obj");
         cube = new GLMesh(mesh); //TODO mesh manager
+        Image image = pngLoad("res/grass.png");
+        assert(image.pixels);
+        cubetex = new GLTexture(image);
 
         mainProgram = (GLDrawProgram*) drawDevice->createProgram();
         const char vstext[] = {
@@ -67,7 +74,6 @@ class MainApplication : public Application
 
         mainProgram->bindStage(0, testvs);
         mainProgram->bindStage(1, testfs);
-        mainProgram->clean();
 
         mainBuffer = new GLFramebuffer;
         mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8));
@@ -105,33 +111,20 @@ class MainApplication : public Application
 
         static float angle = 0.5f;
         angle += 0.05f;
-        //mat4 mMatrix = mat4::getRotation(vec4(angle, angle, 0, 0));
         mat4 mMatrix = mat4::getRotation(angle, vec4(1, 1, 0, 0));
-        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 10));
+        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 100));
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
         mainProgram->use();
         mainBuffer->bind();
-        glBindBuffer(GL_ARRAY_BUFFER, cube->vbuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->ibuffer);
         glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUniformMatrix4fv(glGetUniformLocation(mainProgram->id, "mvpMatrix"), 
-                1, GL_FALSE, 
-                mvpMatrix.ptr());
+        mainProgram->setUniform("mvpMatrix", mvpMatrix);
 
-        GLuint pos_uint = glGetAttribLocation(mainProgram->id, "position");
-        GLuint norm_uint = glGetAttribLocation(mainProgram->id, "normal");
-        GLuint uv_uint = glGetAttribLocation(mainProgram->id, "uv");
-        glEnableVertexAttribArray(pos_uint);
-        glEnableVertexAttribArray(norm_uint);
-        glEnableVertexAttribArray(uv_uint);
-        glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 24, 0);
-        glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, 24, (void*) 12);
-        glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, 24, (void*) 18);
-        glDrawElements(GL_TRIANGLES, cube->getNElements(), GL_UNSIGNED_SHORT, 0);
+        mainProgram->bindTexture("t_color", 0, cubetex);
+        mainProgram->drawMesh(cube);
 
         ((GLDrawDevice*)drawDevice)->drawToScreen(mainBuffer->getTarget(0),
             mainBuffer->getTarget(1), mainBuffer->getDepth());

@@ -10,10 +10,10 @@ class GLTexture
     public:
     enum Format
     {
-        DEPTH24_STENCIL8,
-        DEPTH32,
+        RGB8,
         RGBA8,
-        RGB8
+        DEPTH32,
+        DEPTH24_STENCIL8,
     };
 
     GLTexture(unsigned w, unsigned h, int format);

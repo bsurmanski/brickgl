@@ -51,7 +51,7 @@ class Mesh
     void addNorm(MeshNormal n) { norms.push_back(n); }
     void addFace(MeshFace f) { faces.push_back(f); }
 
-    virtual ~Mesh(){}
+    virtual ~Mesh();
 };
 
 #endif

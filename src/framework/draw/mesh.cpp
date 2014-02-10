@@ -11,3 +11,8 @@ Mesh::Mesh()
 {
 
 }
+
+Mesh::~Mesh()
+{
+    //vectors should dealloc automatically
+}

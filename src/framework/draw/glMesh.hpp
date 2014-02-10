@@ -22,7 +22,10 @@ class GLMesh
     GLMesh(Mesh &m);
     unsigned getNElements() { return nelem; }
 
-    virtual ~GLMesh(){}
+    virtual ~GLMesh();
+
+    friend class GLDrawDevice;
+    friend class GLDrawProgram;
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <SDL/SDL_image.h>
 
 // XXX cheat by using SDL IMG_Load. maybe reimplement later, for portability
+// probably just use TGA later
 Image pngLoad(std::string filenm)
 {
     SDL_Surface *surf = IMG_Load(filenm.c_str());
@@ -17,7 +18,7 @@ Image pngLoad(std::string filenm)
     image.h = surf->h;
     image.pixels = (uint8_t*) malloc(image.length() * image.bytesPerPixel());
 
-    memcpy(image.pixels, surf->pixels, image.length() * image.bytesPerPixel());
+    memcpy(image.pixels, surf->pixels, surf->pitch * surf->w);
     SDL_FreeSurface(surf);
     return image;
 }

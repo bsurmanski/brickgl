@@ -46,12 +46,17 @@ GLDrawDevice::GLDrawDevice()
     GLDrawShader *dfs = GLDrawShader::fromString(GLDrawShader::FRAGMENT_SHADER, deferredfs);
     deferred->bindStage(0, dvs);
     deferred->bindStage(1, dfs);
-    deferred->clean();
 }
 
 GLDrawDevice::~GLDrawDevice()
 {
     this->~DrawDevice();
+}
+
+void GLDrawDevice::bindTexture(unsigned unit, GLTexture *tex)
+{
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, tex->id);
 }
 
 DrawProgram *GLDrawDevice::createProgram()
@@ -68,15 +73,12 @@ void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, color->id);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, normal->id);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, depth->id);
-    glUniform1i(glGetUniformLocation(deferred->id, "t_color"), 0);
-    glUniform1i(glGetUniformLocation(deferred->id, "t_normal"), 1);
-    glUniform1i(glGetUniformLocation(deferred->id, "t_depth"), 2);
+    bindTexture(0, color);
+    bindTexture(1, normal);
+    bindTexture(2, depth);
+    deferred->setUniform("t_color", 0);
+    deferred->setUniform("t_normal", 1);
+    deferred->setUniform("t_depth", 2);
 
     glBindBuffer(GL_ARRAY_BUFFER, vquad);
     GLuint pos_uint = glGetAttribLocation(deferred->id, "position");
@@ -91,9 +93,4 @@ void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *
 
     // clean up state
     glActiveTexture(GL_TEXTURE0);
-    if(prevFramebuffer)
-        prevFramebuffer->bind();
-
-    if(prevProgram)
-        prevProgram->use();
 }

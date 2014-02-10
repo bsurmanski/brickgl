@@ -19,7 +19,7 @@ class GLDrawDevice : public DrawDevice
     GLDrawDevice();
     virtual ~GLDrawDevice();
     virtual DrawProgram *createProgram();
-    virtual void bindTexture(unsigned unit, GLTexture *tex){}
+    virtual void bindTexture(unsigned unit, GLTexture *tex);
     virtual void drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth);
 };
 

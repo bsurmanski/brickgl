@@ -21,3 +21,6 @@
 *.fs.h
 
 brickgl
+
+callgrind.out.*
+

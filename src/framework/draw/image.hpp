@@ -18,8 +18,13 @@ class Image
         RGBA8,
     };
 
-    Image(){}
-    ~Image() { free(pixels); }
+    Image() : pixels(0) {}
+    ~Image() 
+    { 
+        //free(pixels); 
+        //TODO
+        pixels = 0; 
+    }
 
     uint32_t pitch();
     uint32_t length();

@@ -65,6 +65,12 @@ void float_to_ushort2(float fv[2], uint16_t usv[2])
     usv[1] = float_to_ushort(fv[1]);
 }
 
+GLMesh::~GLMesh()
+{
+    glDeleteBuffers(1, &ibuffer);
+    glDeleteBuffers(1, &vbuffer);
+}
+
 GLMesh::GLMesh(Mesh &m)
 {
     glGenBuffers(1, &ibuffer);

@@ -6,6 +6,7 @@ GLDrawProgram *GLDrawProgram::bound = 0;
 
 GLDrawProgram::GLDrawProgram() : destination(0)
 {
+    dirty = true;
     id = glCreateProgram();
     memset(shaders, 0, sizeof(GLDrawShader*[5]));
 }
@@ -47,13 +48,16 @@ void GLDrawProgram::setDestination(GLFramebuffer *fb)
     destination = fb; 
 }
 
-void GLDrawProgram::bindTexture(char *name, GLTexture *texture)
+void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *texture)
 {
     GLuint texloc = glGetUniformLocation(id, name);
-    textures.push_back(std::pair<GLuint, GLTexture*>(texloc, texture)); 
+    //textures.push_back(std::pair<GLuint, GLTexture*>(texloc, texture)); 
 
     glUseProgram(id);
-    glUniform1i(texloc, texture->id);
+    //TODO: active texture unit
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, texloc);
+    glUniform1i(texloc, unit);
 }
 
 void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
@@ -68,11 +72,13 @@ void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
 
 void GLDrawProgram::use()
 {
-    glUseProgram(id);
-    for(int i = 0; i < textures.size(); i++)
+    if(dirty)
     {
-        glUniform1i(textures[i].first, textures[i].second->id);
+        clean();
+        dirty = false;
     }
+
+    glUseProgram(id);
 
     if(destination) destination->bind();
     else 
@@ -82,4 +88,33 @@ void GLDrawProgram::use()
     }
 
     bound = this;
+}
+
+void GLDrawProgram::drawMesh(GLMesh *mesh)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibuffer);
+    GLuint pos_uint = glGetAttribLocation(id, "position");
+    GLuint norm_uint = glGetAttribLocation(id, "normal");
+    GLuint uv_uint = glGetAttribLocation(id, "uv");
+    glEnableVertexAttribArray(pos_uint);
+    glEnableVertexAttribArray(norm_uint);
+    glEnableVertexAttribArray(uv_uint);
+    glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 24, 0);
+    glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, 24, (void*) 12);
+    glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, 24, (void*) 18);
+
+    glDrawElements(GL_TRIANGLES, mesh->getNElements(), GL_UNSIGNED_SHORT, 0);
+}
+
+void GLDrawProgram::setUniform(const char *nm, int val)
+{
+    use();
+    glUniform1i(glGetUniformLocation(id, nm), val);
+}
+
+void GLDrawProgram::setUniform(const char *nm, mat4 &matrix)
+{
+    use();
+    glUniformMatrix4fv(glGetUniformLocation(id, nm), 1, GL_FALSE, matrix.ptr());
 }

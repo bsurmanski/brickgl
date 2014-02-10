@@ -7,28 +7,38 @@
 
 #include "glFramebuffer.hpp"
 
+#include "../../matrix.hpp"
+#include "../../vector.hpp"
+
+#include "glMesh.hpp"
+
 #include <vector>
 
 class GLDrawProgram : public DrawProgram
 {
-    public: //TODO: shouldnt be public?
-    static GLDrawProgram *bound;
+    bool dirty;
+    void clean();
 
-    GLuint id; 
     GLDrawShader *shaders[5];
     GLFramebuffer *destination;
 
-    std::vector<std::pair<GLuint, GLTexture*> > textures;
+    //std::vector<std::pair<GLuint, GLTexture*> > textures;
 
-    void clean();
 
     public:
+    GLuint id; 
+    static GLDrawProgram *bound;
     GLDrawProgram();
     virtual ~GLDrawProgram();
     void bindStage(int stage, GLDrawShader *program);
-    void bindTexture(char *name, GLTexture *texture);
+    void bindTexture(const char *name, unsigned unit, GLTexture *texture);
     void setDestination(GLFramebuffer *fb); //TODO
     void use();
+
+    void drawMesh(GLMesh *mesh);
+
+    void setUniform(const char *nm, int val);
+    void setUniform(const char *nm, mat4 &matrix);
 };
 
 #endif
