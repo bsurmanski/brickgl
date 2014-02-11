@@ -2,19 +2,19 @@
 #extension GL_ARB_uniform_buffer_object : enable
 #extension GL_ARB_explicit_attrib_location : require
 
-uniform mat4 mvpMatrix; // p_matrix * v_matrix * m_matrix
+uniform mat4 mvpMatrix;
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 
-smooth out vec3 fNormal;
-smooth out vec2 fUv;
+smooth out vec4 fnormal;
+smooth out vec2 fuv;
 
 void main()
 {
     gl_Position = mvpMatrix * vec4(position, 1.0f);
-    fNormal = (mvpMatrix * vec4(normal, 0.0f)).xyz;
-    fNormal.z = -fNormal.z;
-    fUv = uv;
+    fnormal = mvpMatrix * vec4(normal, 0.0f);
+    fnormal.z = -fnormal.z; // z is inversed
+    fuv = vec2(uv.x, -uv.y); // uv.y is inversed
 }

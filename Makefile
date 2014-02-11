@@ -6,26 +6,25 @@ src/framework/sdlWindow.cpp\
 src/framework/window.cpp\
 src/framework/input/sdlInputDevice.cpp\
 src/framework/input/inputDevice.cpp\
+src/framework/draw/drawProgram.cpp\
+src/framework/draw/drawDevice.cpp\
 src/framework/draw/glTexture.cpp\
 src/framework/draw/glFramebuffer.cpp\
 src/framework/draw/image.cpp\
 src/framework/draw/glDrawDevice.cpp\
 src/framework/draw/glMesh.cpp\
 src/framework/draw/glDrawShader.cpp\
-src/framework/draw/drawProgram.cpp\
-src/framework/draw/drawDevice.cpp\
-src/framework/draw/objFormat.cpp\
 src/framework/draw/glDrawProgram.cpp\
+src/framework/draw/objFormat.cpp\
 src/framework/draw/pngFormat.cpp\
 src/framework/draw/mesh.cpp\
 src/framework/application.cpp
 
-GLSL=src/glsl/default.fs\
-	 src/glsl/default.vs\
-	 src/glsl/test.fs\
-	 src/glsl/test.vs\
-	 src/glsl/cube.fs\
-	 src/glsl/cube.vs\
+GLSL=\
+	 src/glsl/light.fs\
+	 src/glsl/light.vs\
+	 src/glsl/mesh.fs\
+	 src/glsl/mesh.vs\
 	 src/glsl/deferred.fs\
 	 src/glsl/deferred.vs
 
@@ -44,6 +43,7 @@ LDFLAGS= -lSDL -lSDL_image -lGL -lm -lc
 	xxd -i $< $@
 
 all: $(SRC) $(GLSLH)
+	ctags -R -o .git/ctags
 	g++ $(SRC) $(CFLAGS) $(LDFLAGS) -o brickgl
 
 clean:

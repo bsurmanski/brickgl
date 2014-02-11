@@ -7,13 +7,25 @@ GLDrawProgram *GLDrawProgram::bound = 0;
 GLDrawProgram::GLDrawProgram() : destination(0)
 {
     dirty = true;
+    isAccum = false;
     id = glCreateProgram();
     memset(shaders, 0, sizeof(GLDrawShader*[5]));
 }
 
+
 GLDrawProgram::~GLDrawProgram()
 {
 
+}
+
+GLDrawProgram *GLDrawProgram::fromVFShaderStrings(const char *vstring, const char *fstring)
+{
+    GLDrawShader *vshader = GLDrawShader::fromString(GLDrawShader::VERTEX_SHADER, vstring);
+    GLDrawShader *fshader = GLDrawShader::fromString(GLDrawShader::FRAGMENT_SHADER, fstring);
+    GLDrawProgram *program = new GLDrawProgram;
+    program->bindStage(0, vshader);
+    program->bindStage(1, fshader);
+    return program;
 }
 
 void GLDrawProgram::clean()
@@ -48,16 +60,15 @@ void GLDrawProgram::setDestination(GLFramebuffer *fb)
     destination = fb; 
 }
 
-void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *texture)
+void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *tex)
 {
-    GLuint texloc = glGetUniformLocation(id, name);
-    //textures.push_back(std::pair<GLuint, GLTexture*>(texloc, texture)); 
+    unsigned tid = 0;
+    if(tex) tid = tex->id;
 
     glUseProgram(id);
-    //TODO: active texture unit
     glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, texloc);
-    glUniform1i(texloc, unit);
+    glBindTexture(GL_TEXTURE_2D, tid);
+    glUniform1i(glGetUniformLocation(id, name), unit);
 }
 
 void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
@@ -72,6 +83,8 @@ void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
 
 void GLDrawProgram::use()
 {
+    if(bound == this) return;
+
     if(dirty)
     {
         clean();
@@ -80,11 +93,21 @@ void GLDrawProgram::use()
 
     glUseProgram(id);
 
+    if(isAccum)
+    {
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
+    } else
+    {
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     if(destination) destination->bind();
     else 
     {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glDrawBuffers(1, glBuffers);
+        glDrawBuffer(GL_BACK);
     }
 
     bound = this;
@@ -117,4 +140,10 @@ void GLDrawProgram::setUniform(const char *nm, mat4 &matrix)
 {
     use();
     glUniformMatrix4fv(glGetUniformLocation(id, nm), 1, GL_FALSE, matrix.ptr());
+}
+
+void GLDrawProgram::setUniform(const char *nm, vec4 vector)
+{
+    use();
+    glUniform4fv(glGetUniformLocation(id, nm), 1, vector.ptr());
 }

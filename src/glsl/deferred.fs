@@ -3,8 +3,9 @@
 uniform sampler2D t_color;
 uniform sampler2D t_normal;
 uniform sampler2D t_depth;
+uniform sampler2D t_light;
 
-smooth in vec2 ftexCoord;
+smooth in vec2 fuv;
 
 out vec4 outColor;
 
@@ -30,7 +31,7 @@ vec4 applyLighting(vec4 colorVal)
 
     difuse = clamp(dot(lightPos, normal.xyz), 0.0f, 1.0f);
     specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) 
-        / length(texture(t_depth, ftexCoord));
+        / length(texture(t_depth, fuv));
     
     total = max(ambient, difuse);
 
@@ -39,9 +40,8 @@ vec4 applyLighting(vec4 colorVal)
 
 void main()
 {
-    color = texture(t_color, ftexCoord);
-    normal = texture(t_normal, ftexCoord);
-    //color = applyLighting(color);
-    //outColor = color;
-    outColor = texture(t_color, ftexCoord); //texture(t_color, ftexCoord);
+    color = texture(t_color, fuv);
+    normal = texture(t_normal, fuv);
+    color = applyLighting(color);
+    outColor = texture(t_light, fuv); //color;
 }

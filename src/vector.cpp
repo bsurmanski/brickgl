@@ -1,7 +1,13 @@
 #include "vector.hpp"
 
-#include <cmath>
+#include <math.h>
+#include <stdio.h>
 #include <string.h>
+
+float *vec4::ptr()
+{
+    return v;
+}
 
 vec4::vec4()
 {
@@ -120,4 +126,9 @@ vec4 vec4::pow(int p)
     v.z = powf(v.z, p);
     v.w = powf(v.w, p);
     return v;
+}
+
+void vec4::print()
+{
+    printf("%f, %f, %f, %f", v[0], v[1], v[2], v[3]);
 }

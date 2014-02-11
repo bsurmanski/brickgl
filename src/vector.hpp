@@ -23,6 +23,7 @@ class vec4
         };
     };
 
+    float *ptr();
     vec4();
     vec4(const vec4 &v);
     vec4(float x, float y, float z, float w = 0.0f);
@@ -39,6 +40,8 @@ class vec4
     vec4 cross(vec4 &v);
     vec4 normalized();
     vec4 pow(int p);
+
+    void print();
 };
 
 #endif

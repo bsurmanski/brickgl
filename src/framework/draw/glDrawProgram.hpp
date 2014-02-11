@@ -17,6 +17,7 @@
 class GLDrawProgram : public DrawProgram
 {
     bool dirty;
+    bool isAccum;
     void clean();
 
     GLDrawShader *shaders[5];
@@ -30,15 +31,21 @@ class GLDrawProgram : public DrawProgram
     static GLDrawProgram *bound;
     GLDrawProgram();
     virtual ~GLDrawProgram();
+    
+    static GLDrawProgram *fromVFShaderStrings(const char *vstring, const char *fstring);
+
     void bindStage(int stage, GLDrawShader *program);
     void bindTexture(const char *name, unsigned unit, GLTexture *texture);
     void setDestination(GLFramebuffer *fb); //TODO
     void use();
 
+    void setAccum(bool b) { isAccum = b; }
+
     void drawMesh(GLMesh *mesh);
 
     void setUniform(const char *nm, int val);
     void setUniform(const char *nm, mat4 &matrix);
+    void setUniform(const char *nm, vec4 vector);
 };
 
 #endif
