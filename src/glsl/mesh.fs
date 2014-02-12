@@ -3,6 +3,7 @@
 #extension GL_ARB_explicit_attrib_location : require
 
 //smooth in vec4 fcolor;
+smooth in vec4 fposition;
 smooth in vec4 fnormal;
 smooth in vec2 fuv;
 
@@ -10,9 +11,11 @@ uniform sampler2D t_color;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outNormal; 
+layout(location = 2) out vec4 outPosition;
 
 void main()
 {
     outColor = texture(t_color, fuv);
     outNormal = fnormal;
+    outPosition = fposition;
 }

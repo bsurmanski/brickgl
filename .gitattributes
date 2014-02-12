@@ -1,3 +1,4 @@
 *.mtl binary
 *.obj binary
 *.graphml binary
+*.blend binary

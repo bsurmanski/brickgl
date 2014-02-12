@@ -1,6 +1,7 @@
 #version 130
 
 uniform sampler2D t_normal;
+uniform sampler2D t_position;
 uniform sampler2D t_depth;
 // uniform sampler2D t_shadow; // shadow buffer?
 
@@ -14,6 +15,7 @@ out vec4 lightAccum;
 
 // gbuffer samples
 vec4 normal;
+vec4 position;
 vec4 depth;
 
 vec4 applyLighting()
@@ -26,7 +28,7 @@ vec4 applyLighting()
     float specular;
     float total;
 
-    vec3 pixelPos = vec3(fuv, length(depth));
+    vec3 pixelPos = position.xyz;
     vec3 lightDir = normalize(light.xyz - pixelPos);
     vec3 h = (lightDir + vec3(0,0,1)) / length(lightDir + vec3(0,0,1));
 
@@ -45,5 +47,6 @@ void main()
 {
     normal = texture(t_normal, fuv);
     depth = texture(t_depth, fuv);
+    position = texture(t_position, fuv);
     lightAccum = applyLighting();
 }

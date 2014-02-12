@@ -12,6 +12,9 @@ class GLTexture
     {
         RGB8,
         RGBA8,
+        RGB32F,
+        RGBA32F,
+        RGB10A2,
         DEPTH32,
         DEPTH24_STENCIL8,
     };

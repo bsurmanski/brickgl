@@ -31,6 +31,7 @@
 
 GLMesh *cube;
 GLTexture *cubetex;
+vec4 cursor;
 
 class MainApplication : public Application
 {
@@ -65,9 +66,10 @@ class MainApplication : public Application
         mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
 
         mainBuffer = new GLFramebuffer;
-        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8));
-        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8));
-        mainBuffer->setDepth(new GLTexture(640, 480, GLTexture::DEPTH32));
+        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8)); //color
+        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8)); //normal
+        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA32F)); //position
+        mainBuffer->setDepth(new GLTexture(640, 480, GLTexture::DEPTH32)); // depth
         mainProgram->setDestination(mainBuffer);
 
         const char lightvs[] = {
@@ -107,13 +109,24 @@ class MainApplication : public Application
         }
 
         keystate = SDL_GetKeyState(0);
+        if(keystate[SDLK_LEFT])
+            cursor.x -= 1;
+
+        if(keystate[SDLK_RIGHT])
+            cursor.x += 1;
+
+        if(keystate[SDLK_UP])
+            cursor.z -= 1;
+
+        if(keystate[SDLK_DOWN])
+            cursor.z += 1;
     }
 
     void applyLighting()
     {
         static float angle = 0.5f;
         angle += 0.05f;
-        mat4 mMatrix = mat4::getTranslation(vec4(-2,2,-10,0));
+        mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
         mat4 vMatrix = mat4::getIdentity(); //mat4::getRotation(angle, vec4(1, 0, 0, 0));
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
@@ -123,12 +136,11 @@ class MainApplication : public Application
         glClear(GL_COLOR_BUFFER_BIT);
 
         //lightProgram->setUniform("mvpMatrix", mvpMatrix);
-        vec4 lightPos = mvpMatrix * vec4(0.0f, 0.0f, -2.0f, 1.0f);
-        lightPos.print();
-        printf("\n");
+        vec4 lightPos = vMatrix * vec4(10.0f, 10.0f, 10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
-        lightProgram->bindTexture("t_depth", 1, mainBuffer->getDepth());
+        lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
+        lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
 
@@ -136,8 +148,9 @@ class MainApplication : public Application
     {
         static float angle = 0.5f;
         angle += 0.05f;
-        mat4 mMatrix = mat4::getRotation(angle, vec4(1, 1, 0, 0));
-        mat4 vMatrix = mat4::getTranslation(vec4(sin(angle/3.1), cos(angle/4.2), - 100));
+        mat4 mMatrix = mat4::getTranslation(cursor);
+        mat4 vMatrix = mat4::getTranslation(vec4(-20, -20, -100, 1));
+        vMatrix = vMatrix * mat4::getRotation(0.701f, vec4(1, 0, 0, 0));
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
@@ -147,6 +160,7 @@ class MainApplication : public Application
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mainProgram->setUniform("mvpMatrix", mvpMatrix);
+        mainProgram->setUniform("mMatrix", mMatrix);
 
         mainProgram->bindTexture("t_color", 0, cubetex);
         mainProgram->drawMesh(cube);
