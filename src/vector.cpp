@@ -43,7 +43,7 @@ vec4 vec4::operator*(float f)
     return ret;
 }
 
-vec4 vec4::operator+(vec4 &v)
+vec4 vec4::operator+(vec4 v)
 {
     vec4 ret;
     ret.x = x + v.x;
@@ -53,13 +53,13 @@ vec4 vec4::operator+(vec4 &v)
     return ret;
 }
 
-vec4 vec4::operator-(vec4 &v)
+vec4 vec4::operator-(vec4 v)
 {
     vec4 ret;
-    ret.x = x + v.x;
-    ret.y = y + v.y;
-    ret.z = z + v.z;
-    ret.w = w + v.w;
+    ret.x = x - v.x;
+    ret.y = y - v.y;
+    ret.z = z - v.z;
+    ret.w = w - v.w;
     return ret;
 }
 

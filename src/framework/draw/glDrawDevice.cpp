@@ -33,8 +33,6 @@ GLDrawDevice::GLDrawDevice()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    glDepthFunc(GL_LEQUAL);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // full screen quad
     glGenBuffers(1, &vquad);
@@ -86,6 +84,7 @@ void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *
     deferred->use();
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_BLEND);
 
     bindTexture(0, color);
     bindTexture(1, normal);

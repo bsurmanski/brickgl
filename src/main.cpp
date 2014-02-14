@@ -29,9 +29,12 @@
 #include "framework/draw/objFormat.hpp"
 #include "framework/draw/pngFormat.hpp"
 
+#include <vector>
+
 GLMesh *cube;
 GLTexture *cubetex;
 vec4 cursor;
+vec4 target;
 
 class MainApplication : public Application
 {
@@ -41,6 +44,8 @@ class MainApplication : public Application
 
     GLDrawProgram *lightProgram;
     GLFramebuffer *lightBuffer;
+
+    std::vector<vec4> bricks;
 
     public:
 
@@ -109,17 +114,35 @@ class MainApplication : public Application
         }
 
         keystate = SDL_GetKeyState(0);
-        if(keystate[SDLK_LEFT])
-            cursor.x -= 1;
+        static bool left = 0;
+        static bool right = 0;
+        static bool up = 0;
+        static bool down = 0;
+        static bool space = 0;
+        if(keystate[SDLK_LEFT] && !left)
+            target.x -= 8;
 
-        if(keystate[SDLK_RIGHT])
-            cursor.x += 1;
+        if(keystate[SDLK_RIGHT] && !right)
+            target.x += 8;
 
-        if(keystate[SDLK_UP])
-            cursor.z -= 1;
+        if(keystate[SDLK_UP] && !up)
+            target.z -= 8;
 
-        if(keystate[SDLK_DOWN])
-            cursor.z += 1;
+        if(keystate[SDLK_DOWN] && !down)
+            target.z += 8;
+
+        if(keystate[SDLK_SPACE] && !space)
+        {
+            bricks.push_back(target);
+        }
+
+        left = keystate[SDLK_LEFT];
+        right = keystate[SDLK_RIGHT];
+        down = keystate[SDLK_DOWN];
+        up = keystate[SDLK_UP];
+        space = keystate[SDLK_SPACE];
+
+        cursor = cursor + ((target - cursor) * 0.25f);
     }
 
     void applyLighting()
@@ -142,13 +165,17 @@ class MainApplication : public Application
         lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
         lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
+
+        lightPos = vMatrix * vec4(-10.0f, 10.0f, -10.0f, 1.0f);
+        lightProgram->setUniform("light", lightPos);
+        ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
 
-    void drawMesh()
+    void drawMesh(vec4 pos)
     {
         static float angle = 0.5f;
         angle += 0.05f;
-        mat4 mMatrix = mat4::getTranslation(cursor);
+        mat4 mMatrix = mat4::getTranslation(pos);
         mat4 vMatrix = mat4::getTranslation(vec4(-20, -20, -100, 1));
         vMatrix = vMatrix * mat4::getRotation(0.701f, vec4(1, 0, 0, 0));
 
@@ -156,8 +183,6 @@ class MainApplication : public Application
 
         mainProgram->use();
         mainBuffer->bind();
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mainProgram->setUniform("mvpMatrix", mvpMatrix);
         mainProgram->setUniform("mMatrix", mMatrix);
@@ -168,7 +193,18 @@ class MainApplication : public Application
 
     void draw()
     {
-        drawMesh();
+        mainProgram->use();
+        mainBuffer->bind();
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        printf("drawing, size: %d\n", bricks.size());
+        drawMesh(cursor);
+        for(int i = 0; i < bricks.size(); i++)
+        {
+            drawMesh(bricks[i]);
+        }
+
         applyLighting();
 
         ((GLDrawDevice*)drawDevice)->drawToScreen(mainBuffer->getTarget(0),

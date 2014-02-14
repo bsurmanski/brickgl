@@ -93,6 +93,7 @@ void GLDrawProgram::use()
 
     glUseProgram(id);
 
+    glEnable(GL_BLEND);
     if(isAccum)
     {
         glBlendEquation(GL_FUNC_ADD);
@@ -101,6 +102,7 @@ void GLDrawProgram::use()
     {
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE, GL_ZERO);
     }
 
     if(destination) destination->bind();
