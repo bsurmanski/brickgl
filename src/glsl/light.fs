@@ -21,26 +21,26 @@ vec4 depth;
 vec4 applyLighting()
 {
     float SPECULARITY = 0.5;
-    float AMBIENT = 0.25;
 
-    float ambient;
     float difuse;
     float specular;
     float total;
 
     vec3 pixelPos = position.xyz;
     vec3 lightDir = normalize(light.xyz - pixelPos);
-    vec3 h = (lightDir + vec3(0,0,1)) / length(lightDir + vec3(0,0,1));
+    vec3 h = normalize(lightDir + normalize(vec3(fuv.x,fuv.y,1)));
 
-    ambient = AMBIENT;
 
-    difuse = clamp(dot(lightDir, normal.xyz), 0.0f, 1.0f);
+    difuse = clamp(
+        dot(lightDir, normal.xyz), 
+        0.0f, 
+        1.0f
+    );
+
     specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) 
         / length(depth);
     
-    total = max(ambient, difuse);
-
-    return vec4(difuse + vec3(specular), length(depth));
+    return vec4(difuse); //TODO: spec
 }
 
 void main()
@@ -48,5 +48,6 @@ void main()
     normal = texture(t_normal, fuv);
     depth = texture(t_depth, fuv);
     position = texture(t_position, fuv);
+
     lightAccum = applyLighting();
 }

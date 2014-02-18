@@ -8,8 +8,8 @@
 
 void mat4::reset()
 {
-    v[0] = v[5] = v[10] = v[15] = 1.0f; 
-    v[1] = v[2] = v[3] = v[4] = 
+    v[0] = v[5] = v[10] = v[15] = 1.0f;
+    v[1] = v[2] = v[3] = v[4] =
         v[6] = v[7] = v[8] = v[9] =
         v[11] = v[12] = v[13] = v[14] = 0.0f;
 }
@@ -192,7 +192,7 @@ mat4 mat4::getRotation(float angle, vec4 r)
     m.v[WX] = m.v[WY] = m.v[WZ] = 0.0f;
 
     m.v[XY] = t * r.x * r.y + s * r.z;
-    m.v[YY] = t * r.y * r.y + c; 
+    m.v[YY] = t * r.y * r.y + c;
     m.v[ZY] = t * r.y * r.z - s * r.x;
 
     m.v[XZ] = t * r.x * r.z - s * r.y;
@@ -264,19 +264,19 @@ mat4 mat4::transposed()
 
 void mat4::translate(vec4 off)
 {
-    mat4 tmp = getTranslation(off); 
+    mat4 tmp = getTranslation(off);
     *this = tmp * *this;
 }
 
 void mat4::scale(vec4 s)
 {
-    mat4 tmp = getScale(s); 
+    mat4 tmp = getScale(s);
     *this = tmp * *this;
 }
 
 void mat4::scale(float f)
 {
-    mat4 tmp = getScale(vec4(f, f, f, 1.0f)); 
+    mat4 tmp = getScale(vec4(f, f, f, 1.0f));
     *this = tmp * *this;
 }
 

@@ -57,7 +57,7 @@ static const unsigned glBuffers[] =
 
 void GLDrawProgram::setDestination(GLFramebuffer *fb)
 {
-    destination = fb; 
+    destination = fb;
 }
 
 void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *tex)
@@ -106,7 +106,7 @@ void GLDrawProgram::use()
     }
 
     if(destination) destination->bind();
-    else 
+    else
     {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);

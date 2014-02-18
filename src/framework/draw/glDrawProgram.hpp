@@ -27,11 +27,11 @@ class GLDrawProgram : public DrawProgram
 
 
     public:
-    GLuint id; 
+    GLuint id;
     static GLDrawProgram *bound;
     GLDrawProgram();
     virtual ~GLDrawProgram();
-    
+
     static GLDrawProgram *fromVFShaderStrings(const char *vstring, const char *fstring);
 
     void bindStage(int stage, GLDrawShader *program);

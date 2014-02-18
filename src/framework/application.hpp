@@ -9,7 +9,7 @@ class Application
     public:
     Window *window;
     DrawDevice *drawDevice;
-    
+
     public:
     Application(){}
     Application(Window *window, DrawDevice *ddev);

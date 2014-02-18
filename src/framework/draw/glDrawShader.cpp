@@ -21,7 +21,7 @@ GLDrawShader *GLDrawShader::fromString(unsigned stage, const char *str, int len)
     {
         char buf[512];
         glGetShaderInfoLog(shader->id, 512, 0, buf);
-        std::cout << buf << std::endl; 
+        std::cout << buf << std::endl;
         assert(false); //TODO: handle error
     }
 

@@ -15,11 +15,13 @@ vec4 normal;
 vec4 depth;
 vec4 light;
 
+float AMBIENT = 0.25f;
+
 void main()
 {
     color = texture(t_color, fuv);
     normal = texture(t_normal, fuv);
     depth = texture(t_depth, fuv);
-    light = texture(t_light, fuv) + 0.1 * depth; 
+    light = texture(t_light, fuv) + vec4(AMBIENT);
     outColor = light * color;
 }

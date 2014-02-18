@@ -29,7 +29,7 @@ std::string Window::getName()
 
 void Window::setWidth(uint32_t w)
 {
-    width = w; 
+    width = w;
 }
 
 void Window::setHeight(uint32_t h)

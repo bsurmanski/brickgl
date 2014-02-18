@@ -72,7 +72,7 @@ Mesh objLoad(std::string filenm)
             uint16_t ni[3];
             uint16_t ui[3];
 
-            fscanf(file, "f %hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu", 
+            fscanf(file, "f %hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu",
                     &vi[0], &ui[0], &ni[0],
                     &vi[1], &ui[1], &ni[1],
                     &vi[2], &ui[2], &ni[2]);

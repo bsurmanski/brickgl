@@ -27,7 +27,7 @@ static const char deferredfs[] =
 
 GLDrawDevice::GLDrawDevice()
 {
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -82,7 +82,7 @@ void GLDrawDevice::drawFullscreenQuad()
 void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth, GLTexture *light)
 {
     deferred->use();
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_BLEND);
 

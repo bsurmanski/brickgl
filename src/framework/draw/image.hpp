@@ -19,11 +19,11 @@ class Image
     };
 
     Image() : pixels(0) {}
-    ~Image() 
-    { 
-        //free(pixels); 
+    ~Image()
+    {
+        //free(pixels);
         //TODO
-        pixels = 0; 
+        pixels = 0;
     }
 
     uint32_t pitch();

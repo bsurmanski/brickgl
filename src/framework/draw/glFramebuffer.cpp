@@ -6,7 +6,7 @@
 
 GLFramebuffer *GLFramebuffer::bound = 0;
 
-static unsigned glBuffers[] = 
+static unsigned glBuffers[] =
 {
     GL_COLOR_ATTACHMENT0,
     GL_COLOR_ATTACHMENT1,
@@ -33,6 +33,12 @@ void GLFramebuffer::bind()
     glDrawBuffers(targets.size(), glBuffers);
 }
 
+void GLFramebuffer::clear()
+{
+    bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 GLTexture *GLFramebuffer::getDepth()
 {
     return depth;
@@ -57,7 +63,7 @@ void GLFramebuffer::appendTarget(GLTexture *t)
     GLFramebuffer *prev = bound;
 
     glBindFramebuffer(GL_FRAMEBUFFER, id);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + targets.size(), 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + targets.size(),
             GL_TEXTURE_2D, t->id, 0);
 
     targets.push_back(t);

@@ -21,7 +21,7 @@ class GLTexture
 
     GLTexture(unsigned w, unsigned h, int format);
     GLTexture(Image &i);
-    
+
     friend class GLDrawProgram;
     friend class GLDrawDevice;
     friend class GLFramebuffer;

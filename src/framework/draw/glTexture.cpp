@@ -76,7 +76,7 @@ GLTexture::GLTexture(unsigned w, unsigned h, int format)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, getGLInternalFormat(format), w, h, 0, 
+    glTexImage2D(GL_TEXTURE_2D, 0, getGLInternalFormat(format), w, h, 0,
             getGLFormat(format), getGLType(format), 0);
 }
 
@@ -88,8 +88,8 @@ GLTexture::GLTexture(Image &i)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, getGLInternalFormat(i.format), 
-            i.w, i.h, 0, getGLFormat(i.format), 
+    glTexImage2D(GL_TEXTURE_2D, 0, getGLInternalFormat(i.format),
+            i.w, i.h, 0, getGLFormat(i.format),
             getGLType(i.format), i.pixels);
     //TODO: getGLFormat expects GLTexture::Format, not Image::Format
 }

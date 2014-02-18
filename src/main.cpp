@@ -96,7 +96,7 @@ class MainApplication : public Application
 
     ~MainApplication()
     {
-        delete mainProgram; 
+        delete mainProgram;
     }
 
     void input()
@@ -150,7 +150,7 @@ class MainApplication : public Application
         static float angle = 0.5f;
         angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
-        mat4 vMatrix = mat4::getIdentity(); //mat4::getRotation(angle, vec4(1, 0, 0, 0));
+        mat4 vMatrix = mat4::getIdentity();
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
         lightProgram->use();
@@ -166,7 +166,7 @@ class MainApplication : public Application
         lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
 
-        lightPos = vMatrix * vec4(-10.0f, 10.0f, -10.0f, 1.0f);
+        lightPos = vMatrix * vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
@@ -193,13 +193,10 @@ class MainApplication : public Application
 
     void draw()
     {
-        mainProgram->use();
-        mainBuffer->bind();
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        lightBuffer->clear();
+        mainBuffer->clear();
 
-        printf("drawing, size: %d\n", bricks.size());
-        drawMesh(cursor);
+        drawMesh(cursor); //cursor brick
         for(int i = 0; i < bricks.size(); i++)
         {
             drawMesh(bricks[i]);

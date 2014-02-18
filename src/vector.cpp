@@ -16,7 +16,7 @@ vec4::vec4()
 
 vec4::vec4(const vec4 &v)
 {
-    memcpy(this->v, v.v, sizeof(float[4])); 
+    memcpy(this->v, v.v, sizeof(float[4]));
 }
 
 vec4::vec4(float x, float y, float z, float w)

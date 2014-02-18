@@ -15,7 +15,7 @@ class DrawDevice : public Device
     public:
     DrawDevice();
     virtual ~DrawDevice();
-    virtual void update(float dt); 
+    virtual void update(float dt);
     virtual DrawProgram *createProgram() = 0;
 };
 

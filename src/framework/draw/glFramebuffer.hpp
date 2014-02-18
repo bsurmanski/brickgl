@@ -12,13 +12,14 @@ class GLFramebuffer
 {
     GLuint id;
     GLTexture *depth;
-    std::vector<GLTexture*> targets; 
+    std::vector<GLTexture*> targets;
 
     static GLFramebuffer *bound;
 
     public:
     GLFramebuffer();
     void bind();
+    void clear();
 
     GLTexture *getDepth();
     void setDepth(GLTexture *t);

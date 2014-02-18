@@ -4,7 +4,7 @@
 class DrawProgram
 {
     protected:
-    virtual ~DrawProgram(){}     
+    virtual ~DrawProgram(){}
 };
 
 #endif

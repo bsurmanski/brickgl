@@ -14,7 +14,7 @@ struct IVertex
 
 struct GLVertex
 {
-    float v[3]; 
+    float v[3];
     int16_t norm[3];
     uint16_t uv[2];
     uint8_t PADDING[2];
@@ -105,10 +105,10 @@ GLMesh::GLMesh(Mesh &m)
             if(vindex == -1)
             {
                 vindex = iverts.size();
-                iverts.push_back(iv); 
+                iverts.push_back(iv);
             }
 
-            gli.v[j] = vindex;       
+            gli.v[j] = vindex;
         }
         glindex.push_back(gli);
     }
@@ -132,14 +132,14 @@ GLMesh::GLMesh(Mesh &m)
 
 
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer);
-    glBufferData(GL_ARRAY_BUFFER, 
-            sizeof(GLVertex) * glverts.size(), 
+    glBufferData(GL_ARRAY_BUFFER,
+            sizeof(GLVertex) * glverts.size(),
             glverts.data(),
             GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-            sizeof(GLIndex) * glindex.size(), 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            sizeof(GLIndex) * glindex.size(),
             glindex.data(),
             GL_STATIC_DRAW);
 
