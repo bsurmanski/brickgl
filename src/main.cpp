@@ -31,10 +31,11 @@
 
 #include <vector>
 
-GLMesh *cube;
+GLMesh *brick;
 GLTexture *cubetex;
 vec4 cursor;
 vec4 target;
+GLMesh *plate;
 
 class MainApplication : public Application
 {
@@ -56,9 +57,12 @@ class MainApplication : public Application
         isRunning = true;
 
         Mesh mesh = objLoad("res/1x1.obj");
-        cube = new GLMesh(mesh); //TODO mesh manager
+        brick = new GLMesh(mesh); //TODO mesh manager
         Image image = pngLoad("res/Untitled.png");
         cubetex = new GLTexture(image);
+
+        Mesh plateMesh = objLoad("res/1x1f.obj");
+        plate = new GLMesh(plateMesh);
 
         mainProgram = (GLDrawProgram*) drawDevice->createProgram();
         const char mainvs[] = {
@@ -171,7 +175,7 @@ class MainApplication : public Application
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
 
-    void drawMesh(vec4 pos)
+    void drawMesh(GLMesh *mesh, vec4 pos)
     {
         static float angle = 0.5f;
         angle += 0.05f;
@@ -188,7 +192,7 @@ class MainApplication : public Application
         mainProgram->setUniform("mMatrix", mMatrix);
 
         mainProgram->bindTexture("t_color", 0, cubetex);
-        mainProgram->drawMesh(cube);
+        mainProgram->drawMesh(mesh);
     }
 
     void draw()
@@ -196,10 +200,18 @@ class MainApplication : public Application
         lightBuffer->clear();
         mainBuffer->clear();
 
-        drawMesh(cursor); //cursor brick
+        for(int j = 0; j < 32; j++)
+        {
+            for(int i = 0; i < 32; i++)
+            {
+                drawMesh(plate, vec4(i * 8, 0, j * 8, 1));
+            }
+        }
+
+        drawMesh(brick, cursor); //cursor brick
         for(int i = 0; i < bricks.size(); i++)
         {
-            drawMesh(bricks[i]);
+            drawMesh(brick, bricks[i]);
         }
 
         applyLighting();
