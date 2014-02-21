@@ -5,7 +5,8 @@ uniform sampler2D t_position;
 uniform sampler2D t_depth;
 // uniform sampler2D t_shadow; // shadow buffer?
 
-uniform vec4 light; // screen space light position
+uniform vec4 camera;  // world space camera position
+uniform vec4 light; // world space light position
 // uniform vec4 ads; // TODO ambient defuse specular properties
 // uniform vec4 color; // TODO light color
 
@@ -21,15 +22,17 @@ vec4 depth;
 vec4 applyLighting()
 {
     float SPECULARITY = 0.5;
+    float SPEC_POWER = 20.0f;
 
     float difuse;
     float specular;
     float total;
 
-    vec3 pixelPos = position.xyz;
-    vec3 lightDir = normalize(light.xyz - pixelPos);
-    vec3 h = normalize(lightDir + normalize(vec3(fuv.x,fuv.y,1)));
+    vec3 lightDir = normalize(light.xyz - position.xyz); 
+    vec3 cameraDir = normalize(camera.xyz - position.xyz);
 
+    // used in specular only
+    vec3 h = normalize(lightDir + cameraDir);
 
     difuse = clamp(
         dot(lightDir, normal.xyz), 
@@ -37,15 +40,15 @@ vec4 applyLighting()
         1.0f
     );
 
-    specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) 
-        / length(depth);
+    specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) * 
+        (SPEC_POWER / length(light.xyz - position.xyz)); 
     
-    return vec4(difuse); //TODO: spec
+    return vec4(vec3(difuse), specular); 
 }
 
 void main()
 {
-    normal = texture(t_normal, fuv);
+    normal = normalize(texture(t_normal, fuv));
     depth = texture(t_depth, fuv);
     position = texture(t_position, fuv);
 

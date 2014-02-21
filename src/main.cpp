@@ -165,12 +165,17 @@ class MainApplication : public Application
         //lightProgram->setUniform("mvpMatrix", mvpMatrix);
         vec4 lightPos = vMatrix * vec4(10.0f, 10.0f, 10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
+        lightProgram->setUniform("camera", vec4(0,0,0,1));
         lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
         lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
         lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
 
         lightPos = vMatrix * vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
+        lightProgram->setUniform("light", lightPos);
+        ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
+
+        lightPos = vMatrix * vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
@@ -200,11 +205,11 @@ class MainApplication : public Application
         lightBuffer->clear();
         mainBuffer->clear();
 
-        for(int j = 0; j < 32; j++)
+        for(int j = -16; j < 16; j++)
         {
-            for(int i = 0; i < 32; i++)
+            for(int i = -16; i < 16; i++)
             {
-                drawMesh(plate, vec4(i * 8, 0, j * 8, 1));
+                drawMesh(plate, vec4(i * 8, -8.0f, j * 8, 1));
             }
         }
 

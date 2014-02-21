@@ -17,7 +17,6 @@ void main()
 {
     gl_Position = mvpMatrix * vec4(position, 1.0f);
     fposition = mMatrix * vec4(position, 1.0f);
-    fnormal = mvpMatrix * vec4(normal, 0.0f);
-    fnormal.z = -fnormal.z; // z is inversed
+    fnormal = mMatrix * vec4(normal, 0.0f);
     fuv = vec2(uv.x, -uv.y); // uv.y is inversed
 }
