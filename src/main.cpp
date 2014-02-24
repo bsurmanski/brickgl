@@ -200,6 +200,17 @@ class MainApplication : public Application
         mainProgram->drawMesh(mesh);
     }
 
+    void drawBrick(GLMesh *mesh, vec4 pos, unsigned w, unsigned h)
+    {
+        for(int j = 0; j < h; j++)
+        {
+            for(int i = 0; i < w; i++)
+            {
+                drawMesh(mesh, pos + vec4(i * 8, 0, j * 8, 0));
+            }
+        }
+    }
+
     void draw()
     {
         lightBuffer->clear();
@@ -213,7 +224,8 @@ class MainApplication : public Application
             }
         }
 
-        drawMesh(brick, cursor); //cursor brick
+        //drawMesh(brick, cursor); //cursor brick
+        drawBrick(brick, cursor, 2, 2);
         for(int i = 0; i < bricks.size(); i++)
         {
             drawMesh(brick, bricks[i]);
