@@ -22,7 +22,7 @@
 #include "framework/sdlWindow.hpp"
 #include "matrix.hpp"
 #include "vector.hpp"
-#include "brick.h"
+#include "brick.hpp"
 
 #include "framework/draw/mesh.hpp"
 #include "framework/draw/glMesh.hpp"
@@ -32,10 +32,19 @@
 #include <vector>
 
 GLMesh *brick;
+GLMesh *sphere;
 GLTexture *cubetex;
 vec4 cursor;
 vec4 target;
 GLMesh *plate;
+GLTexture *plateTex;
+
+static unsigned WIDTH = 640;
+static unsigned HEIGHT = 480;
+static unsigned BRICKSZ = 1;
+
+int mousex;
+int mousey;
 
 class MainApplication : public Application
 {
@@ -46,20 +55,26 @@ class MainApplication : public Application
     GLDrawProgram *lightProgram;
     GLFramebuffer *lightBuffer;
 
-    std::vector<vec4> bricks;
+    std::vector<Brick> bricks;
 
     public:
 
     MainApplication()
     {
-        window = new SDLWindow(640, 480, "BrickSim");
+        window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
         isRunning = true;
 
         Mesh mesh = objLoad("res/1x1.obj");
         brick = new GLMesh(mesh); //TODO mesh manager
-        Image image = pngLoad("res/Untitled.png");
+        Image image = pngLoad("res/pink2.png");
         cubetex = new GLTexture(image);
+
+        Image plateImage = pngLoad("res/grass.png");
+        plateTex = new GLTexture(plateImage);
+
+        Mesh sphereMesh = objLoad("res/sphere.obj");
+        sphere = new GLMesh(sphereMesh);
 
         Mesh plateMesh = objLoad("res/1x1f.obj");
         plate = new GLMesh(plateMesh);
@@ -75,10 +90,10 @@ class MainApplication : public Application
         mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
 
         mainBuffer = new GLFramebuffer;
-        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8)); //color
-        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8)); //normal
-        mainBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA32F)); //position
-        mainBuffer->setDepth(new GLTexture(640, 480, GLTexture::DEPTH32)); // depth
+        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //color
+        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //normal
+        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA32F)); //position
+        mainBuffer->setDepth(new GLTexture(WIDTH, HEIGHT, GLTexture::DEPTH32)); // depth
         mainProgram->setDestination(mainBuffer);
 
         const char lightvs[] = {
@@ -92,7 +107,7 @@ class MainApplication : public Application
         lightProgram = GLDrawProgram::fromVFShaderStrings(lightvs, lightfs);
         lightProgram->setAccum(true);
         lightBuffer = new GLFramebuffer;
-        lightBuffer->appendTarget(new GLTexture(640, 480, GLTexture::RGBA8));
+        lightBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8));
         lightProgram->setDestination(lightBuffer);
 
         mainProgram->use();
@@ -114,6 +129,10 @@ class MainApplication : public Application
             {
                 case SDL_QUIT:
                     isRunning = false;
+                    break;
+                case SDL_MOUSEMOTION:
+                    SDL_GetMouseState(&mousex, &mousey);
+                    break;
             }
         }
 
@@ -123,6 +142,8 @@ class MainApplication : public Application
         static bool up = 0;
         static bool down = 0;
         static bool space = 0;
+        static bool comma = 0;
+        static bool period = 0;
         if(keystate[SDLK_LEFT] && !left)
             target.x -= 8;
 
@@ -135,16 +156,33 @@ class MainApplication : public Application
         if(keystate[SDLK_DOWN] && !down)
             target.z += 8;
 
+        if(keystate[SDLK_PERIOD] && !period)
+            target.y -= 8;
+
+        if(keystate[SDLK_COMMA] && !comma)
+            target.y += 8;
+
         if(keystate[SDLK_SPACE] && !space)
         {
-            bricks.push_back(target);
+            bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
+            //bricks.push_back(target + vec4(8,0,0,0));
+            //bricks.push_back(target + vec4(0,0,8,0));
+            //bricks.push_back(target + vec4(8,0,8,0));
         }
+
+        if(keystate[SDLK_1])
+            BRICKSZ = 1;
+
+        if(keystate[SDLK_2])
+            BRICKSZ = 2;
 
         left = keystate[SDLK_LEFT];
         right = keystate[SDLK_RIGHT];
         down = keystate[SDLK_DOWN];
         up = keystate[SDLK_UP];
         space = keystate[SDLK_SPACE];
+        comma = keystate[SDLK_COMMA];
+        period = keystate[SDLK_PERIOD];
 
         cursor = cursor + ((target - cursor) * 0.25f);
     }
@@ -152,10 +190,17 @@ class MainApplication : public Application
     void applyLighting()
     {
         static float angle = 0.5f;
-        angle += 0.05f;
+        //angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
         mat4 vMatrix = mat4::getIdentity();
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
+
+        vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+        vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
+        vec4 pos3 = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
+        //drawMesh(sphere, cubetex, pos1);
+        //drawMesh(sphere, cubetex, pos2);
+        //drawMesh(sphere, cubetex, pos3);
 
         lightProgram->use();
         lightBuffer->bind();
@@ -163,7 +208,7 @@ class MainApplication : public Application
         glClear(GL_COLOR_BUFFER_BIT);
 
         //lightProgram->setUniform("mvpMatrix", mvpMatrix);
-        vec4 lightPos = vMatrix * vec4(10.0f, 10.0f, 10.0f, 1.0f);
+        vec4 lightPos = vMatrix * vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         lightProgram->setUniform("camera", vec4(0,0,0,1));
         lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
@@ -180,7 +225,7 @@ class MainApplication : public Application
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
 
-    void drawMesh(GLMesh *mesh, vec4 pos)
+    void drawMesh(GLMesh *mesh, GLTexture *tex, vec4 pos)
     {
         static float angle = 0.5f;
         angle += 0.05f;
@@ -196,7 +241,7 @@ class MainApplication : public Application
         mainProgram->setUniform("mvpMatrix", mvpMatrix);
         mainProgram->setUniform("mMatrix", mMatrix);
 
-        mainProgram->bindTexture("t_color", 0, cubetex);
+        mainProgram->bindTexture("t_color", 0, tex);
         mainProgram->drawMesh(mesh);
     }
 
@@ -206,7 +251,18 @@ class MainApplication : public Application
         {
             for(int i = 0; i < w; i++)
             {
-                drawMesh(mesh, pos + vec4(i * 8, 0, j * 8, 0));
+                drawMesh(mesh, cubetex, pos + vec4(i * 8, 0, j * 8, 0));
+            }
+        }
+    }
+
+    void drawBrick(GLMesh *mesh, GLTexture *tex, vec4 pos, unsigned w, unsigned h)
+    {
+        for(int j = 0; j < h; j++)
+        {
+            for(int i = 0; i < w; i++)
+            {
+                drawMesh(mesh, tex, pos + vec4(i * 8, 0, j * 8, 0));
             }
         }
     }
@@ -216,20 +272,23 @@ class MainApplication : public Application
         lightBuffer->clear();
         mainBuffer->clear();
 
-        for(int j = -16; j < 16; j++)
-        {
-            for(int i = -16; i < 16; i++)
-            {
-                drawMesh(plate, vec4(i * 8, -8.0f, j * 8, 1));
-            }
-        }
-
-        //drawMesh(brick, cursor); //cursor brick
-        drawBrick(brick, cursor, 2, 2);
+        drawBrick(plate, plateTex, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
         for(int i = 0; i < bricks.size(); i++)
         {
-            drawMesh(brick, bricks[i]);
+            Brick b = bricks[i];
+            drawBrick(b.mesh, b.position, b.w, b.h );
         }
+
+#define MOUSESUPPORT
+#ifdef MOUSESUPPORT
+        vec4 MOUSE;
+        glReadBuffer(GL_COLOR_ATTACHMENT2);
+        glReadPixels(mousex, HEIGHT-mousey, 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
+        MOUSE.x = MOUSE.x - (int) MOUSE.x % 8;
+        MOUSE.z = MOUSE.z - (int) MOUSE.z % 8;
+        target = MOUSE;
+#endif
+        drawBrick(brick, cursor, BRICKSZ, BRICKSZ);
 
         applyLighting();
 
