@@ -1,5 +1,6 @@
 SRC=\
 src/main.cpp\
+src/brick.cpp\
 src/matrix.cpp\
 src/vector.cpp\
 src/framework/sdlWindow.cpp\

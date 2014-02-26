@@ -164,7 +164,20 @@ class MainApplication : public Application
 
         if(keystate[SDLK_SPACE] && !space)
         {
-            bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
+            Brick b(brick, target, BRICKSZ, BRICKSZ);
+            bool collision = false;
+            for(int i = 0; i < bricks.size(); i++)
+            {
+                if(b.collides(bricks[i]))
+                {
+                    printf("collision\n");
+                    collision = true;
+                    break;
+                }
+            }
+
+            if(!collision)
+                bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
             //bricks.push_back(target + vec4(8,0,0,0));
             //bricks.push_back(target + vec4(0,0,8,0));
             //bricks.push_back(target + vec4(8,0,8,0));
@@ -284,8 +297,9 @@ class MainApplication : public Application
         vec4 MOUSE;
         glReadBuffer(GL_COLOR_ATTACHMENT2);
         glReadPixels(mousex, HEIGHT-mousey, 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
-        MOUSE.x = MOUSE.x - (int) MOUSE.x % 8;
-        MOUSE.z = MOUSE.z - (int) MOUSE.z % 8;
+        MOUSE.x = round(MOUSE.x / 8.0f) * 8.0f;
+        MOUSE.y = ceil(MOUSE.y / 9.6f) * 9.6f;
+        MOUSE.z = round(MOUSE.z / 8.0f) * 8.0f;
         target = MOUSE;
 #endif
         drawBrick(brick, cursor, BRICKSZ, BRICKSZ);
