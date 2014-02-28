@@ -4,6 +4,6 @@ bool Brick::collides(Brick &b2)
 {
     return
         (right() > b2.left() && left() < b2.right()) && // x is intersecting
-        (front() < b2.back() && back() > b2.front()) &&
+        (back() > b2.front() && front() < b2.back()) &&
         (bottom() < b2.top() && top() > b2.bottom());
 }

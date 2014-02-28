@@ -57,9 +57,12 @@ class MainApplication : public Application
 
     std::vector<Brick> bricks;
 
+    vec4 cameraRotation;
+    vec4 cameraPosition;
+
     public:
 
-    MainApplication()
+    MainApplication() : cameraRotation(-0.707, 0, 0, 0), cameraPosition(0, 0, -100, 1)
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
@@ -118,11 +121,35 @@ class MainApplication : public Application
         delete mainProgram;
     }
 
+    bool tryPlaceBrick()
+    {
+        Brick b(brick, target, BRICKSZ, BRICKSZ);
+        bool collision = false;
+        for(int i = 0; i < bricks.size(); i++)
+        {
+            if(b.collides(bricks[i]))
+            {
+                printf("collision\n");
+                collision = true;
+                break;
+            }
+        }
+
+        if(!collision)
+        {
+            bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
+            return true;
+        }
+
+        return false;
+    }
+
     void input()
     {
         uint8_t *keystate;
         SDL_Event event;
 
+        static bool rclick = 0;
         while(SDL_PollEvent(&event))
         {
             switch(event.type)
@@ -131,7 +158,25 @@ class MainApplication : public Application
                     isRunning = false;
                     break;
                 case SDL_MOUSEMOTION:
+                    if(rclick)
+                    {
+                        cameraRotation.x += event.motion.yrel / 100.0f;
+                        cameraRotation.y -= event.motion.xrel / 100.0f;
+                    }
                     SDL_GetMouseState(&mousex, &mousey);
+                    break;
+
+                case SDL_MOUSEBUTTONDOWN:
+                    if(event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        tryPlaceBrick();
+                    }
+                    if(event.button.button == SDL_BUTTON_RIGHT)
+                        rclick = true;
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    if(event.button.button == SDL_BUTTON_RIGHT)
+                        rclick = false;
                     break;
             }
         }
@@ -164,23 +209,7 @@ class MainApplication : public Application
 
         if(keystate[SDLK_SPACE] && !space)
         {
-            Brick b(brick, target, BRICKSZ, BRICKSZ);
-            bool collision = false;
-            for(int i = 0; i < bricks.size(); i++)
-            {
-                if(b.collides(bricks[i]))
-                {
-                    printf("collision\n");
-                    collision = true;
-                    break;
-                }
-            }
-
-            if(!collision)
-                bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
-            //bricks.push_back(target + vec4(8,0,0,0));
-            //bricks.push_back(target + vec4(0,0,8,0));
-            //bricks.push_back(target + vec4(8,0,8,0));
+            tryPlaceBrick();
         }
 
         if(keystate[SDLK_1])
@@ -205,35 +234,35 @@ class MainApplication : public Application
         static float angle = 0.5f;
         //angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
-        mat4 vMatrix = mat4::getIdentity();
+        mat4 vMatrix = mat4::getTranslation(cameraPosition) *
+            mat4::getRotation(cameraRotation);
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
         vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
         vec4 pos3 = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
-        //drawMesh(sphere, cubetex, pos1);
-        //drawMesh(sphere, cubetex, pos2);
-        //drawMesh(sphere, cubetex, pos3);
 
         lightProgram->use();
         lightBuffer->bind();
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //lightProgram->setUniform("mvpMatrix", mvpMatrix);
-        vec4 lightPos = vMatrix * vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+        vec4 camPos = mat4::getRotation(cameraRotation) * (cameraPosition);
+        camPos.print();
+        printf("\n");
+        vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
-        lightProgram->setUniform("camera", vec4(0,0,0,1));
+        lightProgram->setUniform("camera", camPos);
         lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
         lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
         lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
 
-        lightPos = vMatrix * vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
+        lightPos = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
 
-        lightPos = vMatrix * vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
+        lightPos = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
     }
@@ -243,8 +272,8 @@ class MainApplication : public Application
         static float angle = 0.5f;
         angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(pos);
-        mat4 vMatrix = mat4::getTranslation(vec4(-20, -20, -100, 1));
-        vMatrix = vMatrix * mat4::getRotation(0.701f, vec4(1, 0, 0, 0));
+        mat4 vMatrix = mat4::getTranslation(cameraPosition) *
+            mat4::getRotation(cameraRotation);
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
