@@ -12,6 +12,7 @@ class GLTexture
     {
         RGB8,
         RGBA8,
+        RGBA8I,
         RGB32F,
         RGBA32F,
         RGB10A2,

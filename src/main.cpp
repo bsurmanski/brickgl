@@ -94,7 +94,7 @@ class MainApplication : public Application
 
         mainBuffer = new GLFramebuffer;
         mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //color
-        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //normal
+        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8I)); //normal
         mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA32F)); //position
         mainBuffer->setDepth(new GLTexture(WIDTH, HEIGHT, GLTexture::DEPTH32)); // depth
         mainProgram->setDestination(mainBuffer);
@@ -248,8 +248,9 @@ class MainApplication : public Application
         glClear(GL_COLOR_BUFFER_BIT);
 
         vec4 camPos = mat4::getRotation(cameraRotation) * (cameraPosition);
-        camPos.print();
-        printf("\n");
+        camPos.z = -camPos.z;
+        //camPos.print();
+        //printf("\n");
         vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         lightProgram->setUniform("camera", camPos);

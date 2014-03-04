@@ -20,6 +20,9 @@ static int getGLFormat(int format)
             return GL_RGB;
         case GLTexture::RGBA32F:
             return GL_RGBA;
+
+        case GLTexture::RGBA8I:
+            return GL_RGBA;
         default:
             assert(false);
     }
@@ -43,6 +46,9 @@ static int getGLInternalFormat(int format)
             return GL_DEPTH_COMPONENT32;
         case GLTexture::DEPTH24_STENCIL8:
             return GL_DEPTH24_STENCIL8;
+
+        case GLTexture::RGBA8I:
+            return GL_RGBA8_SNORM;
         default:
             assert(false);
     }
@@ -54,7 +60,6 @@ static int getGLType(int format)
     {
         case GLTexture::RGBA8:
         case GLTexture::RGB8:
-            return GL_UNSIGNED_BYTE;
         case GLTexture::RGB10A2:
             return GL_UNSIGNED_BYTE;
         case GLTexture::RGB32F:
@@ -62,6 +67,9 @@ static int getGLType(int format)
         case GLTexture::DEPTH32:
         case GLTexture::DEPTH24_STENCIL8:
             return GL_FLOAT;
+
+        case GLTexture::RGBA8I:
+            return GL_BYTE;
         default:
             assert(false);
     }
