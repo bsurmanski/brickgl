@@ -7,14 +7,27 @@
 
 #include "vector.hpp"
 #include "framework/draw/glMesh.hpp"
+#include "framework/draw/glTexture.hpp"
+
+#include <vector>
 
 struct Brick
 {
-    GLMesh *mesh;
+    static bool isInit;
+    static std::vector<Brick> brickTypes;
+
+    static GLMesh *fullMesh;
+    static GLMesh *flatMesh;
+    static GLTexture *plateTexture;
+    static GLTexture *brickTexture;
+
+    static void init();
+
     vec4 position;
     unsigned w;
     unsigned h;
-    Brick(GLMesh *m, vec4 p, unsigned wi, unsigned hi) : mesh(m), position(p), w(wi), h(hi) {}
+    bool flat;
+    Brick(vec4 p, unsigned wi, unsigned hi, bool fl = false);
 
     float left() { return position.x; }
     float right() { return position.x + w * 7.99f; }

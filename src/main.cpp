@@ -24,6 +24,7 @@
 #include "vector.hpp"
 #include "brick.hpp"
 
+#include "framework/draw/camera.hpp"
 #include "framework/draw/mesh.hpp"
 #include "framework/draw/glMesh.hpp"
 #include "framework/draw/objFormat.hpp"
@@ -31,13 +32,8 @@
 
 #include <vector>
 
-GLMesh *brick;
-GLMesh *sphere;
-GLTexture *cubetex;
 vec4 cursor;
 vec4 target;
-GLMesh *plate;
-GLTexture *plateTex;
 
 static unsigned WIDTH = 640;
 static unsigned HEIGHT = 480;
@@ -56,31 +52,19 @@ class MainApplication : public Application
     GLFramebuffer *lightBuffer;
 
     std::vector<Brick> bricks;
-
-    vec4 cameraRotation;
-    vec4 cameraPosition;
+    Camera *camera;
 
     public:
 
-    MainApplication() : cameraRotation(-0.707, 0, 0, 0), cameraPosition(0, 0, -100, 1)
+    MainApplication()
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
         isRunning = true;
 
-        Mesh mesh = objLoad("res/1x1.obj");
-        brick = new GLMesh(mesh); //TODO mesh manager
-        Image image = pngLoad("res/pink2.png");
-        cubetex = new GLTexture(image);
+        camera = new Camera;
 
-        Image plateImage = pngLoad("res/grass.png");
-        plateTex = new GLTexture(plateImage);
-
-        Mesh sphereMesh = objLoad("res/sphere.obj");
-        sphere = new GLMesh(sphereMesh);
-
-        Mesh plateMesh = objLoad("res/1x1f.obj");
-        plate = new GLMesh(plateMesh);
+        Brick::init();
 
         mainProgram = (GLDrawProgram*) drawDevice->createProgram();
         const char mainvs[] = {
@@ -123,7 +107,7 @@ class MainApplication : public Application
 
     bool tryPlaceBrick()
     {
-        Brick b(brick, target, BRICKSZ, BRICKSZ);
+        Brick b(target, BRICKSZ, BRICKSZ);
         bool collision = false;
         for(int i = 0; i < bricks.size(); i++)
         {
@@ -137,7 +121,7 @@ class MainApplication : public Application
 
         if(!collision)
         {
-            bricks.push_back(Brick(brick, target, BRICKSZ, BRICKSZ));
+            bricks.push_back(Brick(target, BRICKSZ, BRICKSZ));
             return true;
         }
 
@@ -160,8 +144,8 @@ class MainApplication : public Application
                 case SDL_MOUSEMOTION:
                     if(rclick)
                     {
-                        cameraRotation.x += event.motion.yrel / 100.0f;
-                        cameraRotation.y -= event.motion.xrel / 100.0f;
+                        camera->addRotation(vec4( event.motion.yrel / 100.0f,
+                                                 -event.motion.xrel / 100.0f, 0, 0));
                     }
                     SDL_GetMouseState(&mousex, &mousey);
                     break;
@@ -227,6 +211,12 @@ class MainApplication : public Application
         period = keystate[SDLK_PERIOD];
 
         cursor = cursor + ((target - cursor) * 0.25f);
+        //cursor.print();
+        //printf("\n");
+        if(cursor.distanceSq(target) > 1000 * 1000)
+        {
+            cursor = target;
+        }
     }
 
     void applyLighting()
@@ -234,9 +224,8 @@ class MainApplication : public Application
         static float angle = 0.5f;
         //angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
-        mat4 vMatrix = mat4::getTranslation(cameraPosition) *
-            mat4::getRotation(cameraRotation);
-        mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
+        mat4 vMatrix = camera->getView();
+        mat4 mvpMatrix = camera->getPerspective() * vMatrix * mMatrix;
 
         vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
@@ -247,10 +236,8 @@ class MainApplication : public Application
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        vec4 camPos = mat4::getRotation(cameraRotation) * (cameraPosition);
+        vec4 camPos = mat4::getRotation(camera->getRotation()) * (camera->getOffset());
         camPos.z = -camPos.z;
-        //camPos.print();
-        //printf("\n");
         vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         lightProgram->setUniform("light", lightPos);
         lightProgram->setUniform("camera", camPos);
@@ -273,8 +260,7 @@ class MainApplication : public Application
         static float angle = 0.5f;
         angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(pos);
-        mat4 vMatrix = mat4::getTranslation(cameraPosition) *
-            mat4::getRotation(cameraRotation);
+        mat4 vMatrix = camera->getView();
 
         mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
 
@@ -286,17 +272,6 @@ class MainApplication : public Application
 
         mainProgram->bindTexture("t_color", 0, tex);
         mainProgram->drawMesh(mesh);
-    }
-
-    void drawBrick(GLMesh *mesh, vec4 pos, unsigned w, unsigned h)
-    {
-        for(int j = 0; j < h; j++)
-        {
-            for(int i = 0; i < w; i++)
-            {
-                drawMesh(mesh, cubetex, pos + vec4(i * 8, 0, j * 8, 0));
-            }
-        }
     }
 
     void drawBrick(GLMesh *mesh, GLTexture *tex, vec4 pos, unsigned w, unsigned h)
@@ -315,11 +290,11 @@ class MainApplication : public Application
         lightBuffer->clear();
         mainBuffer->clear();
 
-        drawBrick(plate, plateTex, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
+        drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
         for(int i = 0; i < bricks.size(); i++)
         {
             Brick b = bricks[i];
-            drawBrick(b.mesh, b.position, b.w, b.h );
+            drawBrick(Brick::fullMesh, Brick::brickTexture, b.position, b.w, b.h );
         }
 
 #define MOUSESUPPORT
@@ -330,9 +305,10 @@ class MainApplication : public Application
         MOUSE.x = round(MOUSE.x / 8.0f) * 8.0f;
         MOUSE.y = ceil(MOUSE.y / 9.6f) * 9.6f;
         MOUSE.z = round(MOUSE.z / 8.0f) * 8.0f;
-        target = MOUSE;
+        if(MOUSE.x != NAN && MOUSE.y != NAN && MOUSE.z != NAN)
+            target = MOUSE;
 #endif
-        drawBrick(brick, cursor, BRICKSZ, BRICKSZ);
+        drawBrick(Brick::fullMesh, Brick::brickTexture, cursor, BRICKSZ, BRICKSZ);
 
         applyLighting();
 

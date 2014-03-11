@@ -100,3 +100,13 @@ void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *
     // clean up state
     glActiveTexture(GL_TEXTURE0);
 }
+
+/*
+void drawToTexture(GLTexture *dest,
+                    GLTexture *color,
+                    GLTexture *normal,
+                    GLTexture *depth,
+                    GLTexture *light)
+{
+
+}*/

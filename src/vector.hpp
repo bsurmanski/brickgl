@@ -34,6 +34,7 @@ class vec4
     void normalize();
     float operator*(vec4 &v); // dot product
     float distance(vec4 &v);
+    float distanceSq(vec4 &v);
     float dot(vec4 &v);
     float length();
     float lengthSq();

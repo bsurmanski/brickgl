@@ -7,6 +7,7 @@ src/framework/sdlWindow.cpp\
 src/framework/window.cpp\
 src/framework/input/sdlInputDevice.cpp\
 src/framework/input/inputDevice.cpp\
+src/framework/draw/camera.cpp\
 src/framework/draw/drawProgram.cpp\
 src/framework/draw/drawDevice.cpp\
 src/framework/draw/glTexture.cpp\

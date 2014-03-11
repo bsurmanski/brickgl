@@ -84,6 +84,12 @@ float vec4::distance(vec4 &v)
     return tmp.length();
 }
 
+float vec4::distanceSq(vec4 &v)
+{
+    vec4 tmp = *this - v;
+    return tmp.lengthSq();
+}
+
 float vec4::dot(vec4 &v)
 {
     return x * v.x + y * v.y + z * v.z + w * v.w;

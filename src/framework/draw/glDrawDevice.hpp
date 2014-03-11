@@ -22,6 +22,10 @@ class GLDrawDevice : public DrawDevice
     virtual void bindTexture(unsigned unit, GLTexture *tex);
     virtual void drawFullscreenQuad();
     virtual void drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth, GLTexture *light);
+    /*
+    virtual void drawToTexture(GLTexture *dest, GLTexture *color,
+                    GLTexture *normal, GLTexture *depth, GLTexture *light);
+*/
 };
 
 #endif
