@@ -173,53 +173,27 @@ class MainApplication : public Application
         }
 
         keystate = SDL_GetKeyState(0);
-        static bool left = 0;
-        static bool right = 0;
-        static bool up = 0;
-        static bool down = 0;
-        static bool space = 0;
-        static bool comma = 0;
-        static bool period = 0;
-        if(keystate[SDLK_LEFT] && !left)
-            target.x -= 8;
-
-        if(keystate[SDLK_RIGHT] && !right)
-            target.x += 8;
-
-        if(keystate[SDLK_UP] && !up)
-            target.z -= 8;
-
-        if(keystate[SDLK_DOWN] && !down)
-            target.z += 8;
-
-        if(keystate[SDLK_PERIOD] && !period)
-            target.y -= 8;
-
-        if(keystate[SDLK_COMMA] && !comma)
-            target.y += 8;
-
-        if(keystate[SDLK_SPACE] && !space)
+        if(keystate[SDLK_a])
         {
-            tryPlaceBrick();
+            camera->addPosition(vec4(-1,0,0,0));
         }
 
-        if(keystate[SDLK_1])
-            BRICKSZ = 1;
+        if(keystate[SDLK_d])
+        {
+            camera->addPosition(vec4(1,0,0,0));
+        }
 
-        if(keystate[SDLK_2])
-            BRICKSZ = 2;
+        if(keystate[SDLK_w])
+        {
+            camera->addPosition(vec4(0,0,-1,0));
+        }
 
-        left = keystate[SDLK_LEFT];
-        right = keystate[SDLK_RIGHT];
-        down = keystate[SDLK_DOWN];
-        up = keystate[SDLK_UP];
-        space = keystate[SDLK_SPACE];
-        comma = keystate[SDLK_COMMA];
-        period = keystate[SDLK_PERIOD];
+        if(keystate[SDLK_s])
+        {
+            camera->addPosition(vec4(0,0,1,0));
+        }
 
         cursor = cursor + ((target - cursor) * 0.25f);
-        //cursor.print();
-        //printf("\n");
         if(cursor.distanceSq(target) > 1000 * 1000)
         {
             cursor = target;
@@ -233,6 +207,9 @@ class MainApplication : public Application
         mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
         mat4 vMatrix = camera->getView();
         mat4 mvpMatrix = camera->getPerspective() * vMatrix * mMatrix;
+
+        camera->getView().print();
+        printf("\n");
 
         vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
         vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
@@ -264,8 +241,6 @@ class MainApplication : public Application
 
     void drawMesh(GLMesh *mesh, GLTexture *tex, vec4 pos)
     {
-        static float angle = 0.5f;
-        angle += 0.05f;
         mat4 mMatrix = mat4::getTranslation(pos);
         mat4 vMatrix = camera->getView();
 

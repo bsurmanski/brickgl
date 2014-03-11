@@ -83,3 +83,8 @@ bool Brick::collides(Brick &b2)
         (back() > b2.front() && front() < b2.back()) &&
         (bottom() < b2.top() && top() > b2.bottom());
 }
+
+void Brick::draw()
+{
+
+}

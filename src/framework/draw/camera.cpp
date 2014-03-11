@@ -9,6 +9,7 @@ Camera::Camera() : viewDirty(true)
     x *= fovmod;
     y *= fovmod;
     perspective = mat4::getFrustum(-x, x, -y, y, 1.0f, 512.0f);
+    position = vec4(0,0,0,1);
     rotation = vec4(-0.707, 0, 0, 0);
     offset = vec4(0, 0, -100, 1);
 }

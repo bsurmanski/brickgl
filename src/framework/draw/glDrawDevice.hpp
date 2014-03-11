@@ -13,7 +13,9 @@
 
 class GLDrawDevice : public DrawDevice
 {
-    GLDrawProgram *deferred;
+    GLDrawProgram *deferredProgram;
+    GLDrawProgram *mainProgram;
+    GLDrawProgram *lightProgram;
 
     public:
     GLDrawDevice();

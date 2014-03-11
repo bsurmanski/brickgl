@@ -40,6 +40,8 @@ struct Brick
     unsigned width();
     bool flat();
 
+    void draw();
+
     Brick(Type type, vec4 position);
 
     float left() { return position.x; }

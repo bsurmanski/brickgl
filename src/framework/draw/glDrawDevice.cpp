@@ -39,11 +39,11 @@ GLDrawDevice::GLDrawDevice()
     glBindBuffer(GL_ARRAY_BUFFER, vquad);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float[18]), quadv, GL_STATIC_DRAW);
 
-    deferred = new GLDrawProgram;
+    deferredProgram = new GLDrawProgram;
     GLDrawShader *dvs = GLDrawShader::fromString(GLDrawShader::VERTEX_SHADER, deferredvs);
     GLDrawShader *dfs = GLDrawShader::fromString(GLDrawShader::FRAGMENT_SHADER, deferredfs);
-    deferred->bindStage(0, dvs);
-    deferred->bindStage(1, dfs);
+    deferredProgram->bindStage(0, dvs);
+    deferredProgram->bindStage(1, dfs);
 }
 
 GLDrawDevice::~GLDrawDevice()
@@ -81,7 +81,7 @@ void GLDrawDevice::drawFullscreenQuad()
 
 void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth, GLTexture *light)
 {
-    deferred->use();
+    deferredProgram->use();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_BLEND);
@@ -90,10 +90,10 @@ void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *
     bindTexture(1, normal);
     bindTexture(2, depth);
     bindTexture(3, light);
-    deferred->setUniform("t_color", 0);
-    deferred->setUniform("t_normal", 1);
-    deferred->setUniform("t_depth", 2);
-    deferred->setUniform("t_light", 3);
+    deferredProgram->setUniform("t_color", 0);
+    deferredProgram->setUniform("t_normal", 1);
+    deferredProgram->setUniform("t_depth", 2);
+    deferredProgram->setUniform("t_light", 3);
 
     drawFullscreenQuad();
 
