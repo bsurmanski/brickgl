@@ -107,7 +107,7 @@ class MainApplication : public Application
 
     bool tryPlaceBrick()
     {
-        Brick b(target, BRICKSZ, BRICKSZ);
+        Brick b(Brick::BRICK_AND, target);
         bool collision = false;
         for(int i = 0; i < bricks.size(); i++)
         {
@@ -121,7 +121,7 @@ class MainApplication : public Application
 
         if(!collision)
         {
-            bricks.push_back(Brick(target, BRICKSZ, BRICKSZ));
+            bricks.push_back(Brick(Brick::BRICK_AND, target));
             return true;
         }
 
@@ -157,6 +157,13 @@ class MainApplication : public Application
                     }
                     if(event.button.button == SDL_BUTTON_RIGHT)
                         rclick = true;
+
+                    if(event.button.button == 4)
+                        camera->addOffset(vec4(0,0,1,0));
+
+                    if(event.button.button == 5)
+                        camera->addOffset(vec4(0,0,-1,0));
+
                     break;
                 case SDL_MOUSEBUTTONUP:
                     if(event.button.button == SDL_BUTTON_RIGHT)
@@ -294,7 +301,7 @@ class MainApplication : public Application
         for(int i = 0; i < bricks.size(); i++)
         {
             Brick b = bricks[i];
-            drawBrick(Brick::fullMesh, Brick::brickTexture, b.position, b.w, b.h );
+            drawBrick(Brick::fullMesh, Brick::brickTexture, b.position, b.length(), b.width() );
         }
 
 #define MOUSESUPPORT

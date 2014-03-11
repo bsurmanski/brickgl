@@ -21,17 +21,30 @@ struct Brick
     static GLTexture *plateTexture;
     static GLTexture *brickTexture;
 
+    enum Type
+    {
+        BRICK_OR,
+        BRICK_AND,
+        BRICK_LED,
+        BRICK_WIRE8,
+        BRICK_POWER
+    };
+
+    Type type;
+
     static void init();
 
     vec4 position;
-    unsigned w;
-    unsigned h;
-    bool flat;
-    Brick(vec4 p, unsigned wi, unsigned hi, bool fl = false);
+
+    unsigned length();
+    unsigned width();
+    bool flat();
+
+    Brick(Type type, vec4 position);
 
     float left() { return position.x; }
-    float right() { return position.x + w * 7.99f; }
-    float front() { return position.z - h * 7.99f; } //TODO: check front vs back
+    float right() { return position.x + length() * 7.99f; }
+    float front() { return position.z - width() * 7.99f; } //TODO: check front vs back
     float back() { return position.z; }
     float top() { return position.y + 9.599f; } // TODO: check virtical size
     float bottom() { return position.y; }
