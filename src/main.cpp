@@ -37,7 +37,6 @@ vec4 target;
 
 static unsigned WIDTH = 640;
 static unsigned HEIGHT = 480;
-static unsigned BRICKSZ = 1;
 
 int mousex;
 int mousey;
@@ -45,12 +44,6 @@ int mousey;
 class MainApplication : public Application
 {
     bool isRunning;
-    GLDrawProgram *mainProgram;
-    GLFramebuffer *mainBuffer;
-
-    GLDrawProgram *lightProgram;
-    GLFramebuffer *lightBuffer;
-
     std::vector<Brick> bricks;
     Camera *camera;
 
@@ -62,47 +55,13 @@ class MainApplication : public Application
         drawDevice = new GLDrawDevice();
         isRunning = true;
 
-        camera = new Camera;
+        camera = &((GLDrawDevice*)drawDevice)->camera;
 
         Brick::init();
-
-        mainProgram = (GLDrawProgram*) drawDevice->createProgram();
-        const char mainvs[] = {
-            #include "glsl/mesh.vs.h"
-        };
-        const char mainfs[] = {
-            #include "glsl/mesh.fs.h"
-        };
-
-        mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
-
-        mainBuffer = new GLFramebuffer;
-        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //color
-        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8I)); //normal
-        mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA32F)); //position
-        mainBuffer->setDepth(new GLTexture(WIDTH, HEIGHT, GLTexture::DEPTH32)); // depth
-        mainProgram->setDestination(mainBuffer);
-
-        const char lightvs[] = {
-            #include "glsl/light.vs.h"
-        };
-
-        const char lightfs[] = {
-            #include "glsl/light.fs.h"
-        };
-
-        lightProgram = GLDrawProgram::fromVFShaderStrings(lightvs, lightfs);
-        lightProgram->setAccum(true);
-        lightBuffer = new GLFramebuffer;
-        lightBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8));
-        lightProgram->setDestination(lightBuffer);
-
-        mainProgram->use();
     }
 
     ~MainApplication()
     {
-        delete mainProgram;
     }
 
     bool tryPlaceBrick()
@@ -200,83 +159,28 @@ class MainApplication : public Application
         }
     }
 
-    void applyLighting()
-    {
-        static float angle = 0.5f;
-        //angle += 0.05f;
-        mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
-        mat4 vMatrix = camera->getView();
-        mat4 mvpMatrix = camera->getPerspective() * vMatrix * mMatrix;
-
-        camera->getView().print();
-        printf("\n");
-
-        vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
-        vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
-        vec4 pos3 = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
-
-        lightProgram->use();
-        lightBuffer->bind();
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        vec4 camPos = mat4::getRotation(camera->getRotation()) * (camera->getOffset());
-        camPos.z = -camPos.z;
-        vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
-        lightProgram->setUniform("light", lightPos);
-        lightProgram->setUniform("camera", camPos);
-        lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
-        lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
-        lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
-        ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
-
-        lightPos = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
-        lightProgram->setUniform("light", lightPos);
-        ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
-
-        lightPos = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
-        lightProgram->setUniform("light", lightPos);
-        ((GLDrawDevice*) drawDevice)->drawFullscreenQuad();
-    }
-
-    void drawMesh(GLMesh *mesh, GLTexture *tex, vec4 pos)
-    {
-        mat4 mMatrix = mat4::getTranslation(pos);
-        mat4 vMatrix = camera->getView();
-
-        mat4 mvpMatrix = drawDevice->pMatrix * vMatrix * mMatrix;
-
-        mainProgram->use();
-        mainBuffer->bind();
-
-        mainProgram->setUniform("mvpMatrix", mvpMatrix);
-        mainProgram->setUniform("mMatrix", mMatrix);
-
-        mainProgram->bindTexture("t_color", 0, tex);
-        mainProgram->drawMesh(mesh);
-    }
-
     void drawBrick(GLMesh *mesh, GLTexture *tex, vec4 pos, unsigned w, unsigned h)
     {
         for(int j = 0; j < h; j++)
         {
             for(int i = 0; i < w; i++)
             {
-                drawMesh(mesh, tex, pos + vec4(i * 8, 0, j * 8, 0));
+                mat4 mMat = mat4::getTranslation(pos + vec4(i * 8, 0, j * 8, 0));
+                ((GLDrawDevice*)drawDevice)->drawMesh(mesh, tex, mMat);
             }
         }
     }
 
     void draw()
     {
-        lightBuffer->clear();
-        mainBuffer->clear();
+        ((GLDrawDevice*)drawDevice)->lightBuffer->clear();
+        ((GLDrawDevice*)drawDevice)->mainBuffer->clear();
 
         drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
         for(int i = 0; i < bricks.size(); i++)
         {
             Brick b = bricks[i];
-            drawBrick(Brick::fullMesh, Brick::brickTexture, b.position, b.length(), b.width() );
+            b.draw(drawDevice);
         }
 
 #define MOUSESUPPORT
@@ -290,12 +194,10 @@ class MainApplication : public Application
         if(MOUSE.x != NAN && MOUSE.y != NAN && MOUSE.z != NAN)
             target = MOUSE;
 #endif
-        drawBrick(Brick::fullMesh, Brick::brickTexture, cursor, BRICKSZ, BRICKSZ);
+        drawBrick(Brick::fullMesh, Brick::brickTexture, cursor, 2, 2);
 
-        applyLighting();
-
-        ((GLDrawDevice*)drawDevice)->drawToScreen(mainBuffer->getTarget(0),
-            mainBuffer->getTarget(1), mainBuffer->getDepth(), lightBuffer->getTarget(0));
+        ((GLDrawDevice*)drawDevice)->applyLighting();
+        ((GLDrawDevice*)drawDevice)->drawToScreen();
     }
 
     void run()

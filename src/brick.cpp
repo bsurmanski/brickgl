@@ -84,7 +84,14 @@ bool Brick::collides(Brick &b2)
         (bottom() < b2.top() && top() > b2.bottom());
 }
 
-void Brick::draw()
+void Brick::draw(DrawDevice *dev)
 {
-
+    for(int j = 0; j < width(); j++)
+    {
+        for(int i = 0; i < length(); i++)
+        {
+            mat4 mMat = mat4::getTranslation(position + vec4(i * 8, 0, j * 8, 0));
+            ((GLDrawDevice*)dev)->drawMesh(fullMesh, brickTexture, mMat);
+        }
+    }
 }

@@ -10,12 +10,18 @@
 #include "glFramebuffer.hpp"
 #include "glDrawProgram.hpp"
 #include "glTexture.hpp"
+#include "camera.hpp"
 
 class GLDrawDevice : public DrawDevice
 {
+    public:
     GLDrawProgram *deferredProgram;
     GLDrawProgram *mainProgram;
     GLDrawProgram *lightProgram;
+    GLFramebuffer *mainBuffer;
+    GLFramebuffer *lightBuffer;
+
+    Camera camera;
 
     public:
     GLDrawDevice();
@@ -23,11 +29,10 @@ class GLDrawDevice : public DrawDevice
     virtual DrawProgram *createProgram();
     virtual void bindTexture(unsigned unit, GLTexture *tex);
     virtual void drawFullscreenQuad();
-    virtual void drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth, GLTexture *light);
-    /*
-    virtual void drawToTexture(GLTexture *dest, GLTexture *color,
-                    GLTexture *normal, GLTexture *depth, GLTexture *light);
-*/
+    virtual void drawToScreen();
+
+    virtual void applyLighting();
+    virtual void drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix);
 };
 
 #endif

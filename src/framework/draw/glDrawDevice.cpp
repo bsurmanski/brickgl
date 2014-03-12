@@ -1,6 +1,8 @@
 #include "glDrawDevice.hpp"
 
 #include <stdint.h>
+#include <math.h>
+#include <stdio.h>
 
 // builtin fullscreen quad, and deferred shaders
 
@@ -44,6 +46,41 @@ GLDrawDevice::GLDrawDevice()
     GLDrawShader *dfs = GLDrawShader::fromString(GLDrawShader::FRAGMENT_SHADER, deferredfs);
     deferredProgram->bindStage(0, dvs);
     deferredProgram->bindStage(1, dfs);
+
+    mainProgram = (GLDrawProgram*) this->createProgram();
+    const char mainvs[] = {
+        #include "../../glsl/mesh.vs.h"
+    };
+    const char mainfs[] = {
+        #include "../../glsl/mesh.fs.h"
+    };
+
+    int WIDTH = 640;
+    int HEIGHT = 480;
+    mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
+
+    mainBuffer = new GLFramebuffer;
+    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //color
+    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8I)); //normal
+    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA32F)); //position
+    mainBuffer->setDepth(new GLTexture(WIDTH, HEIGHT, GLTexture::DEPTH32)); // depth
+    mainProgram->setDestination(mainBuffer);
+
+    const char lightvs[] = {
+        #include "../../glsl/light.vs.h"
+    };
+
+    const char lightfs[] = {
+        #include "../../glsl/light.fs.h"
+    };
+
+    lightProgram = GLDrawProgram::fromVFShaderStrings(lightvs, lightfs);
+    lightProgram->setAccum(true);
+    lightBuffer = new GLFramebuffer;
+    lightBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8));
+    lightProgram->setDestination(lightBuffer);
+
+    mainProgram->use();
 }
 
 GLDrawDevice::~GLDrawDevice()
@@ -79,8 +116,12 @@ void GLDrawDevice::drawFullscreenQuad()
     glEnable(GL_DEPTH_TEST);
 }
 
-void GLDrawDevice::drawToScreen(GLTexture *color, GLTexture *normal, GLTexture *depth, GLTexture *light)
+void GLDrawDevice::drawToScreen()
 {
+    GLTexture *color = mainBuffer->getTarget(0);
+    GLTexture *normal = mainBuffer->getTarget(1);
+    GLTexture *depth = mainBuffer->getDepth();
+    GLTexture *light = lightBuffer->getTarget(0);
     deferredProgram->use();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -110,3 +151,55 @@ void drawToTexture(GLTexture *dest,
 {
 
 }*/
+
+void GLDrawDevice::applyLighting()
+{
+    static float angle = 0.5f;
+    //angle += 0.05f;
+    mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
+    mat4 vMatrix = camera.getView();
+    mat4 mvpMatrix = camera.getPerspective() * vMatrix * mMatrix;
+
+    vec4 pos1 = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+    vec4 pos2 = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
+    vec4 pos3 = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
+
+    lightProgram->use();
+    lightBuffer->bind();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    vec4 camPos = mat4::getRotation(camera.getRotation()) * (camera.getOffset());
+    camPos.z = -camPos.z;
+    vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+    lightProgram->setUniform("light", lightPos);
+    lightProgram->setUniform("camera", camPos);
+    lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
+    lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
+    lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
+    this->drawFullscreenQuad();
+
+    lightPos = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
+    lightProgram->setUniform("light", lightPos);
+    this->drawFullscreenQuad();
+
+    lightPos = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
+    lightProgram->setUniform("light", lightPos);
+    this->drawFullscreenQuad();
+}
+
+void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
+{
+    mat4 vMatrix = camera.getView();
+
+    mat4 mvpMatrix = camera.getPerspective() * vMatrix * mMatrix;
+
+    mainProgram->use();
+    mainBuffer->bind();
+
+    mainProgram->setUniform("mvpMatrix", mvpMatrix);
+    mainProgram->setUniform("mMatrix", mMatrix);
+
+    mainProgram->bindTexture("t_color", 0, tex);
+    mainProgram->drawMesh(mesh);
+}

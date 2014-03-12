@@ -8,6 +8,8 @@
 #include "vector.hpp"
 #include "framework/draw/glMesh.hpp"
 #include "framework/draw/glTexture.hpp"
+#include "framework/draw/drawDevice.hpp"
+#include "framework/draw/glDrawDevice.hpp"
 
 #include <vector>
 
@@ -40,7 +42,7 @@ struct Brick
     unsigned width();
     bool flat();
 
-    void draw();
+    void draw(DrawDevice *dev);
 
     Brick(Type type, vec4 position);
 
