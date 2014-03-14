@@ -32,7 +32,6 @@
 
 #include <vector>
 
-vec4 cursor;
 vec4 target;
 
 static unsigned WIDTH = 640;
@@ -46,6 +45,7 @@ class MainApplication : public Application
     bool isRunning;
     std::vector<Brick> bricks;
     Camera *camera;
+    Brick cursor;
 
     public:
 
@@ -53,6 +53,7 @@ class MainApplication : public Application
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
+        cursor = Brick(Brick::BRICK_AND, vec4(0,0,0,1));
         isRunning = true;
 
         camera = &((GLDrawDevice*)drawDevice)->camera;
@@ -66,7 +67,8 @@ class MainApplication : public Application
 
     bool tryPlaceBrick()
     {
-        Brick b(Brick::BRICK_AND, target);
+        Brick b = cursor;
+        b.position = target;
         bool collision = false;
         for(int i = 0; i < bricks.size(); i++)
         {
@@ -80,7 +82,7 @@ class MainApplication : public Application
 
         if(!collision)
         {
-            bricks.push_back(Brick(Brick::BRICK_AND, target));
+            bricks.push_back(b);
             return true;
         }
 
@@ -118,10 +120,10 @@ class MainApplication : public Application
                         rclick = true;
 
                     if(event.button.button == 4)
-                        camera->addOffset(vec4(0,0,1,0));
+                        camera->addOffset(vec4(0,0,5,0));
 
                     if(event.button.button == 5)
-                        camera->addOffset(vec4(0,0,-1,0));
+                        camera->addOffset(vec4(0,0,-5,0));
 
                     break;
                 case SDL_MOUSEBUTTONUP:
@@ -152,10 +154,10 @@ class MainApplication : public Application
             camera->addPosition(vec4(0,0,1,0));
         }
 
-        cursor = cursor + ((target - cursor) * 0.25f);
-        if(cursor.distanceSq(target) > 1000 * 1000)
+        cursor.position = cursor.position + ((target - cursor.position) * 0.25f);
+        if(cursor.position.distanceSq(target) > 1000 * 1000)
         {
-            cursor = target;
+            cursor.position = target;
         }
     }
 
@@ -194,7 +196,7 @@ class MainApplication : public Application
         if(MOUSE.x != NAN && MOUSE.y != NAN && MOUSE.z != NAN)
             target = MOUSE;
 #endif
-        drawBrick(Brick::fullMesh, Brick::brickTexture, cursor, 2, 2);
+        cursor.draw(drawDevice);
 
         ((GLDrawDevice*)drawDevice)->applyLighting();
         ((GLDrawDevice*)drawDevice)->drawToScreen();

@@ -15,13 +15,23 @@
 
 struct Brick
 {
+    private:
     static bool isInit;
     static std::vector<Brick> brickTypes;
 
+    public:
     static GLMesh *fullMesh;
     static GLMesh *flatMesh;
     static GLTexture *plateTexture;
     static GLTexture *brickTexture;
+    static GLTexture *groundTexture;
+    static GLTexture *powerTexture;
+    static GLTexture *outputTexture;
+    static GLTexture *input1Texture;
+    static GLTexture *input2Texture;
+
+    GLTexture *getTexture(int i, int j);
+
 
     enum Type
     {
@@ -31,6 +41,8 @@ struct Brick
         BRICK_WIRE8,
         BRICK_POWER
     };
+
+    bool is2Input();
 
     Type type;
 
@@ -45,6 +57,7 @@ struct Brick
     void draw(DrawDevice *dev);
 
     Brick(Type type, vec4 position);
+    Brick(){}
 
     float left() { return position.x; }
     float right() { return position.x + length() * 7.99f; }

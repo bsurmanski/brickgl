@@ -35,6 +35,7 @@ GLDrawDevice::GLDrawDevice()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glEnable(GL_DEPTH_CLAMP);
 
     // full screen quad
     glGenBuffers(1, &vquad);
