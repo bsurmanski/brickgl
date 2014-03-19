@@ -18,7 +18,7 @@ Image pngLoad(std::string filenm)
     image.h = surf->h;
     image.pixels = (uint8_t*) malloc(image.length() * image.bytesPerPixel());
 
-    memcpy(image.pixels, surf->pixels, surf->pitch * surf->w);
+    memcpy(image.pixels, surf->pixels, surf->pitch * surf->h);
     SDL_FreeSurface(surf);
     return image;
 }
