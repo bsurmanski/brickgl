@@ -157,6 +157,31 @@ class MainApplication : public Application
             camera->addPosition(vec4(0,0,1,0));
         }
 
+        if(keystate[SDLK_1])
+        {
+            cursor = Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+        }
+
+        if(keystate[SDLK_2])
+        {
+            cursor = Brick(Brick::BRICK_WIRE8, vec4(0,0,0,1));
+        }
+
+        if(keystate[SDLK_3])
+        {
+            cursor = Brick(Brick::BRICK_LED, vec4(0,0,0,1));
+        }
+
+        if(keystate[SDLK_LEFT])
+        {
+            cursor.rotate(vec4(0,0.1f,0,0));
+        }
+
+        if(keystate[SDLK_RIGHT])
+        {
+            cursor.rotate(vec4(0,-0.1f,0,0));
+        }
+
         cursor.position = cursor.position + ((target - cursor.position) * 0.25f);
         if(cursor.position.distanceSq(target) > 1000 * 1000)
         {

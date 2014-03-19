@@ -52,7 +52,7 @@ bool Brick::flat()
     switch(type)
     {
         case BRICK_WIRE8:
-            return true;
+            //return true;
         default:
             return false;
     }
@@ -89,6 +89,8 @@ void Brick::init()
 
 Brick::Brick(Type t, vec4 p) : position(p), type(t)
 {
+    position = vec4(0,0,0,1);
+    rotation = vec4(0,0,0,0);
     init();
 
     connections = new std::pair<Brick*, float>[length() * width()];
@@ -129,6 +131,7 @@ GLTexture *Brick::getTexture(int i, int j)
         if(i == 1) return input1Texture;
         return input2Texture;
     }
+    return groundTexture; //TODO other textures
 }
 
 void Brick::draw(DrawDevice *dev)
@@ -137,8 +140,12 @@ void Brick::draw(DrawDevice *dev)
     {
         for(int i = 0; i < length(); i++)
         {
-            mat4 mMat = mat4::getTranslation(position + vec4(i * 8, 0, j * 8, 0));
-            ((GLDrawDevice*)dev)->drawMesh(fullMesh, this->getTexture(i, j), mMat);
+            mat4 mMat =
+                mat4::getTranslation(position) *
+                mat4::getRotation(rotation) *
+                mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
+            ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
         }
     }
 }

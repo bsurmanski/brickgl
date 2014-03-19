@@ -56,6 +56,7 @@ struct Brick
     static void init();
 
     vec4 position;
+    vec4 rotation;
 
     unsigned length();
     unsigned width();
@@ -73,6 +74,8 @@ struct Brick
     float top() { return position.y + 9.599f; } // TODO: check virtical size
     float bottom() { return position.y; }
     bool collides(Brick &b2);
+
+    void rotate(vec4 r) { rotation = rotation + r; }
 };
 
 #endif

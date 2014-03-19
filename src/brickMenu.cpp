@@ -9,6 +9,5 @@ BrickMenu::BrickMenu()
 
 void BrickMenu::draw(DrawDevice *dev)
 {
-    ((GLDrawDevice*) dev)->drawFlat(background, vec4(0,0,1,1));
-    //((GLDrawDevice*) dev)->drawFlat(Brick::brickTexture, vec4(0,0,1,1));
+    //((GLDrawDevice*) dev)->drawFlat(background, vec4(0,0,1,1));
 }
