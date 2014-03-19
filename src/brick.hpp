@@ -5,6 +5,9 @@
  * Brandon Surmanski
  */
 
+#ifndef _BRICK_HPP
+#define _BRICK_HPP
+
 #include "vector.hpp"
 #include "framework/draw/glMesh.hpp"
 #include "framework/draw/glTexture.hpp"
@@ -12,6 +15,8 @@
 #include "framework/draw/glDrawDevice.hpp"
 
 #include <vector>
+#include <array>
+//#include <pair>
 
 struct Brick
 {
@@ -29,6 +34,8 @@ struct Brick
     static GLTexture *outputTexture;
     static GLTexture *input1Texture;
     static GLTexture *input2Texture;
+
+    std::pair<Brick *, float>* connections;
 
     GLTexture *getTexture(int i, int j);
 
@@ -67,3 +74,5 @@ struct Brick
     float bottom() { return position.y; }
     bool collides(Brick &b2);
 };
+
+#endif

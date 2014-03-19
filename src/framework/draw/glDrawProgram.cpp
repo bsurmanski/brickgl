@@ -4,7 +4,7 @@
 
 GLDrawProgram *GLDrawProgram::bound = 0;
 
-GLDrawProgram::GLDrawProgram() : destination(0)
+GLDrawProgram::GLDrawProgram()
 {
     dirty = true;
     isAccum = false;
@@ -55,11 +55,6 @@ static const unsigned glBuffers[] =
     GL_COLOR_ATTACHMENT9,
 };
 
-void GLDrawProgram::setDestination(GLFramebuffer *fb)
-{
-    destination = fb;
-}
-
 void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *tex)
 {
     unsigned tid = 0;
@@ -105,8 +100,6 @@ void GLDrawProgram::use()
         glBlendFunc(GL_ONE, GL_ZERO);
     }
 
-    if(destination) destination->bind();
-    else
     {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);

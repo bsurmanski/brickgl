@@ -219,8 +219,8 @@ mat4 mat4::getScale(vec4 s)
 {
     mat4 m = getIdentity();
     m.v[XX] = s.x;
-    m.v[YY] = s.z;
-    m.v[ZZ] = s.y;
+    m.v[YY] = s.y;
+    m.v[ZZ] = s.z;
     m.v[WW] = s.w;
     return m;
 }

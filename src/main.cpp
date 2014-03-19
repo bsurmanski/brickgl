@@ -23,6 +23,7 @@
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "brick.hpp"
+#include "brickMenu.hpp"
 
 #include "framework/draw/camera.hpp"
 #include "framework/draw/mesh.hpp"
@@ -46,6 +47,7 @@ class MainApplication : public Application
     std::vector<Brick> bricks;
     Camera *camera;
     Brick cursor;
+    BrickMenu *brickMenu;
 
     public:
 
@@ -57,6 +59,7 @@ class MainApplication : public Application
         isRunning = true;
 
         camera = &((GLDrawDevice*)drawDevice)->camera;
+        brickMenu = new BrickMenu;
 
         Brick::init();
     }
@@ -200,6 +203,12 @@ class MainApplication : public Application
 
         ((GLDrawDevice*)drawDevice)->applyLighting();
         ((GLDrawDevice*)drawDevice)->drawToScreen();
+
+        brickMenu->draw(drawDevice);
+        drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
+
+        SDL_GL_SwapBuffers();
+        window->swapBuffers();
     }
 
     void run()
@@ -209,8 +218,6 @@ class MainApplication : public Application
             input();
             draw();
             SDL_Delay(32);
-            SDL_GL_SwapBuffers();
-            window->swapBuffers();
         }
     }
 };

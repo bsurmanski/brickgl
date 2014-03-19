@@ -7,13 +7,13 @@
 // builtin fullscreen quad, and deferred shaders
 
 static float quadv[] = {
-    -1, -1, 0,
-    1, -1, 0,
-    1, 1, 0,
+    -1, -1, 1,  0, 0, -1,  0, 0,
+    1, -1, 1,   0, 0, -1,  1, 0,
+    1, 1, 1,    0, 0, -1,  1, 1,
 
-    -1, -1, 0,
-    1, 1, 0,
-    -1, 1, 0
+    -1, -1, 1,  0, 0, -1,  0, 0,
+    1, 1, 1,    0, 0, -1,  1, 1,
+    -1, 1, 1,   0, 0, -1,  0, 1,
 };
 static GLuint vquad;
 
@@ -40,7 +40,7 @@ GLDrawDevice::GLDrawDevice()
     // full screen quad
     glGenBuffers(1, &vquad);
     glBindBuffer(GL_ARRAY_BUFFER, vquad);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float[18]), quadv, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float[8]) * 6, quadv, GL_STATIC_DRAW);
 
     deferredProgram = new GLDrawProgram;
     GLDrawShader *dvs = GLDrawShader::fromString(GLDrawShader::VERTEX_SHADER, deferredvs);
@@ -56,16 +56,15 @@ GLDrawDevice::GLDrawDevice()
         #include "../../glsl/mesh.fs.h"
     };
 
-    int WIDTH = 640;
-    int HEIGHT = 480;
+    width = 640;
+    height = 480;
     mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
 
     mainBuffer = new GLFramebuffer;
-    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8)); //color
-    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8I)); //normal
-    mainBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA32F)); //position
-    mainBuffer->setDepth(new GLTexture(WIDTH, HEIGHT, GLTexture::DEPTH32)); // depth
-    mainProgram->setDestination(mainBuffer);
+    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8)); //color
+    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8I)); //normal
+    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA32F)); //position
+    mainBuffer->setDepth(new GLTexture(width, height, GLTexture::DEPTH32)); // depth
 
     const char lightvs[] = {
         #include "../../glsl/light.vs.h"
@@ -78,8 +77,7 @@ GLDrawDevice::GLDrawDevice()
     lightProgram = GLDrawProgram::fromVFShaderStrings(lightvs, lightfs);
     lightProgram->setAccum(true);
     lightBuffer = new GLFramebuffer;
-    lightBuffer->appendTarget(new GLTexture(WIDTH, HEIGHT, GLTexture::RGBA8));
-    lightProgram->setDestination(lightBuffer);
+    lightBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8));
 
     mainProgram->use();
 }
@@ -108,7 +106,7 @@ void GLDrawDevice::drawFullscreenQuad()
     glBindBuffer(GL_ARRAY_BUFFER, vquad);
     GLuint pos_uint = glGetAttribLocation(GLDrawProgram::bound->id, "position");
     glEnableVertexAttribArray(pos_uint);
-    glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 12, 0);
+    glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 32, 0);
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -203,4 +201,34 @@ void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
 
     mainProgram->bindTexture("t_color", 0, tex);
     mainProgram->drawMesh(mesh);
+}
+
+void GLDrawDevice::drawFlat(GLTexture *tex, vec4 loc, vec4 scale)
+{
+    mat4 mMatrix = mat4::getTranslation(vec4(-1, -1, 0, 0)) *
+        mat4::getScale(
+            vec4((float) tex->getWidth() / width, (float) tex->getHeight() / height, 1, 1)) *
+        mat4::getTranslation(vec4(1, 1, 0, 0));
+    mat4 mvpMatrix = mMatrix;
+
+    mainProgram->use();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    mainProgram->setUniform("mvpMatrix", mvpMatrix);
+    mainProgram->setUniform("mMatrix", mMatrix);
+    mainProgram->bindTexture("t_color", 0, tex);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vquad);
+    GLuint pos_uint = glGetAttribLocation(mainProgram->id, "position");
+    GLuint uv_uint = glGetAttribLocation(mainProgram->id, "uv");
+    glEnableVertexAttribArray(pos_uint);
+    glEnableVertexAttribArray(uv_uint);
+    glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 32, 0);
+    glVertexAttribPointer(uv_uint, 2, GL_FLOAT, GL_FALSE, 32, (void*) 24);
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 }

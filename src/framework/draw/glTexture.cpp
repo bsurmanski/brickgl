@@ -75,7 +75,7 @@ static int getGLType(int format)
     }
 }
 
-GLTexture::GLTexture(unsigned w, unsigned h, int format)
+GLTexture::GLTexture(unsigned wi, unsigned hi, int format) : w(wi), h(hi)
 {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
@@ -88,7 +88,7 @@ GLTexture::GLTexture(unsigned w, unsigned h, int format)
             getGLFormat(format), getGLType(format), 0);
 }
 
-GLTexture::GLTexture(Image &i)
+GLTexture::GLTexture(Image i) : w(i.w), h(i.h)
 {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);

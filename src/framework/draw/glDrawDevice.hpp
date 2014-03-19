@@ -23,6 +23,9 @@ class GLDrawDevice : public DrawDevice
 
     Camera camera;
 
+    unsigned width;
+    unsigned height;
+
     public:
     GLDrawDevice();
     virtual ~GLDrawDevice();
@@ -31,8 +34,10 @@ class GLDrawDevice : public DrawDevice
     virtual void drawFullscreenQuad();
     virtual void drawToScreen();
 
+
     virtual void applyLighting();
     virtual void drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix);
+    virtual void drawFlat(GLTexture *tex, vec4 loc, vec4 scale = vec4(1,1,1,1));
 };
 
 #endif

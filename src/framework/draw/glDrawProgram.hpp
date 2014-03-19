@@ -21,7 +21,6 @@ class GLDrawProgram : public DrawProgram
     void clean();
 
     GLDrawShader *shaders[5];
-    GLFramebuffer *destination;
 
     //std::vector<std::pair<GLuint, GLTexture*> > textures;
 
@@ -36,7 +35,6 @@ class GLDrawProgram : public DrawProgram
 
     void bindStage(int stage, GLDrawShader *program);
     void bindTexture(const char *name, unsigned unit, GLTexture *texture);
-    void setDestination(GLFramebuffer *fb); //TODO
     void use();
 
     void setAccum(bool b) { isAccum = b; }

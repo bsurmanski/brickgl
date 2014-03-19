@@ -90,6 +90,12 @@ void Brick::init()
 Brick::Brick(Type t, vec4 p) : position(p), type(t)
 {
     init();
+
+    connections = new std::pair<Brick*, float>[length() * width()];
+    for(int i = 0; i < length() * width(); i++)
+    {
+        connections[i] = std::pair<Brick*, float>(NULL, 0.0f);
+    }
 }
 
 //TODO: rotation

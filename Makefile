@@ -20,7 +20,8 @@ src/framework/draw/glDrawProgram.cpp\
 src/framework/draw/objFormat.cpp\
 src/framework/draw/pngFormat.cpp\
 src/framework/draw/mesh.cpp\
-src/framework/application.cpp
+src/framework/application.cpp\
+src/brickMenu.cpp
 
 GLSL=\
 	 src/glsl/light.fs\

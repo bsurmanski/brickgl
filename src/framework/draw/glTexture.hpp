@@ -7,6 +7,8 @@
 class GLTexture
 {
     GLuint id;
+    unsigned w, h;
+
     public:
     enum Format
     {
@@ -20,8 +22,12 @@ class GLTexture
         DEPTH24_STENCIL8,
     };
 
+    unsigned getWidth() { return w; }
+    unsigned getHeight() { return h; }
+
     GLTexture(unsigned w, unsigned h, int format);
-    GLTexture(Image &i);
+    //GLTexture(Image &i);
+    GLTexture(Image i);
 
     friend class GLDrawProgram;
     friend class GLDrawDevice;
