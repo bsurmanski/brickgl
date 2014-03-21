@@ -46,14 +46,15 @@ struct Brick
         BRICK_AND,
         BRICK_LED,
         BRICK_WIRE8,
-        BRICK_POWER
+        BRICK_POWER,
+        BRICK_PLATE32,
+        BRICK_PLATE2x4
     };
 
     bool is2Input();
 
     Type type;
 
-    static void init();
 
     vec4 position;
     vec4 rotation;

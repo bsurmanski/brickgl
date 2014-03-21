@@ -172,6 +172,11 @@ class MainApplication : public Application
             cursor = Brick(Brick::BRICK_LED, vec4(0,0,0,1));
         }
 
+        if(keystate[SDLK_3])
+        {
+            cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
+        }
+
         if(keystate[SDLK_LEFT])
         {
             cursor.rotate(vec4(0,0.1f,0,0));

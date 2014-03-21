@@ -22,12 +22,14 @@ unsigned Brick::width()
     {
         case BRICK_AND:
         case BRICK_OR:
+        case BRICK_PLATE2x4:
             return 2;
         case BRICK_LED:
             return 2;
-
         case BRICK_WIRE8:
             return 1;
+        case BRICK_PLATE32:
+            return 32;
         default: return 1;
     }
 }
@@ -38,11 +40,14 @@ unsigned Brick::length()
     {
         case BRICK_AND:
         case BRICK_OR:
+        case BRICK_PLATE2x4:
             return 4;
         case BRICK_LED:
             return 2;
         case BRICK_WIRE8:
             return 8;
+        case BRICK_PLATE32:
+            return 32;
         default: return 1;
     }
 }
@@ -51,6 +56,10 @@ bool Brick::flat()
 {
     switch(type)
     {
+        case BRICK_PLATE2x4:
+        case BRICK_PLATE32:
+            return true;
+
         case BRICK_WIRE8:
             //return true;
         default:
