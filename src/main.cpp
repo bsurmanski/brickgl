@@ -177,15 +177,19 @@ class MainApplication : public Application
             cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
         }
 
-        if(keystate[SDLK_LEFT])
+        static int left = 0;
+        static int right = 0;
+        if(keystate[SDLK_LEFT] && !left)
         {
-            cursor.rotate(vec4(0,0.1f,0,0));
+            cursor.rotate(vec4(0,M_PI / 2.0f,0,0));
         }
 
-        if(keystate[SDLK_RIGHT])
+        if(keystate[SDLK_RIGHT] && !right)
         {
-            cursor.rotate(vec4(0,-0.1f,0,0));
+            cursor.rotate(vec4(0,M_PI / 2.0f,0,0));
         }
+        left = keystate[SDLK_LEFT];
+        right = keystate[SDLK_RIGHT];
 
         cursor.position = cursor.position + ((target - cursor.position) * 0.25f);
         if(cursor.position.distanceSq(target) > 1000 * 1000)
@@ -241,21 +245,26 @@ class MainApplication : public Application
         window->swapBuffers();
     }
 
+    void update()
+    {
+        for(int i = 0; i < bricks.size(); i++)
+        {
+
+        }
+
+        SDL_Delay(32);
+    }
+
     void run()
     {
         while(isRunning)
         {
             input();
+            update();
             draw();
-            SDL_Delay(32);
         }
     }
 };
-
-void update()
-{
-    SDL_Delay(32);
-}
 
 int main(int argc, char **argv)
 {

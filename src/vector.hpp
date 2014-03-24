@@ -29,6 +29,7 @@ class vec4
     vec4(float x, float y, float z, float w = 0.0f);
     vec4& operator=(const vec4 &v);
     vec4 operator*(float f);
+    vec4 operator/(float f);
     vec4 operator+(vec4 v);
     vec4 operator-(vec4 v);
     void normalize();

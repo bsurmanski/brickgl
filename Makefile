@@ -3,6 +3,7 @@ src/main.cpp\
 src/brick.cpp\
 src/matrix.cpp\
 src/vector.cpp\
+src/box.cpp\
 src/framework/sdlWindow.cpp\
 src/framework/window.cpp\
 src/framework/input/sdlInputDevice.cpp\

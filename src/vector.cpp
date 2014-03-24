@@ -43,6 +43,16 @@ vec4 vec4::operator*(float f)
     return ret;
 }
 
+vec4 vec4::operator/(float f)
+{
+    vec4 ret;
+    ret.x = x / f;
+    ret.y = y / f;
+    ret.z = z / f;
+    ret.w = w / f;
+    return ret;
+}
+
 vec4 vec4::operator+(vec4 v)
 {
     vec4 ret;

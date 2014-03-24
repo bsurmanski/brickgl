@@ -67,6 +67,11 @@ bool Brick::flat()
     }
 }
 
+box Brick::getBox()
+{
+    return box(vec4(position), vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0));
+}
+
 void Brick::init()
 {
     if(!isInit)
@@ -112,10 +117,10 @@ Brick::Brick(Type t, vec4 p) : position(p), type(t)
 //TODO: rotation
 bool Brick::collides(Brick &b2)
 {
-    return
-        (right() > b2.left() && left() < b2.right()) && // x is intersecting
-        (back() > b2.front() && front() < b2.back()) &&
-        (bottom() < b2.top() && top() > b2.bottom());
+    box o = b2.getBox();
+    getBox().print();
+    o.print();
+    return getBox().collides3(o);
 }
 
 bool Brick::is2Input()
@@ -141,6 +146,19 @@ GLTexture *Brick::getTexture(int i, int j)
         return input2Texture;
     }
     return groundTexture; //TODO other textures
+}
+
+mat4 Brick::getMatrix()
+{
+    return mat4::getTranslation(position) *
+            mat4::getRotation(rotation);
+}
+
+mat4 Brick::getPegMatrix(unsigned i, unsigned j)
+{
+    return mat4::getTranslation(position) *
+        mat4::getRotation(rotation) *
+        mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
 }
 
 void Brick::draw(DrawDevice *dev)

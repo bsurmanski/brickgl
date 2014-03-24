@@ -9,6 +9,7 @@
 #define _BRICK_HPP
 
 #include "vector.hpp"
+#include "box.hpp"
 #include "framework/draw/glMesh.hpp"
 #include "framework/draw/glTexture.hpp"
 #include "framework/draw/drawDevice.hpp"
@@ -35,6 +36,8 @@ struct Brick
     static GLTexture *input1Texture;
     static GLTexture *input2Texture;
 
+    static void init();
+
     std::pair<Brick *, float>* connections;
 
     GLTexture *getTexture(int i, int j);
@@ -55,7 +58,6 @@ struct Brick
 
     Type type;
 
-
     vec4 position;
     vec4 rotation;
 
@@ -63,10 +65,15 @@ struct Brick
     unsigned width();
     bool flat();
 
+    box getBox();
+
     void draw(DrawDevice *dev);
 
     Brick(Type type, vec4 position);
     Brick(){}
+
+    mat4 getMatrix();
+    mat4 getPegMatrix(unsigned i, unsigned j);
 
     float left() { return position.x; }
     float right() { return position.x + length() * 7.99f; }
