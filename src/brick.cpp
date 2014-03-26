@@ -69,7 +69,7 @@ bool Brick::flat()
 
 box Brick::getBox()
 {
-    return box(vec4(position), vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0));
+    return box(vec4(position), getMatrix() * vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0));
 }
 
 void Brick::init()

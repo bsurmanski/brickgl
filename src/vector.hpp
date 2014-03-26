@@ -39,7 +39,7 @@ class vec4
     float dot(vec4 &v);
     float length();
     float lengthSq();
-    vec4 cross(vec4 &v);
+    vec4 cross(vec4 v);
     vec4 normalized();
     vec4 pow(int p);
 

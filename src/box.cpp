@@ -25,6 +25,37 @@ bool overlaps(float p1, float d1, float p2, float d2)
            ((p2 <= p1) && ((p2 + d2) > p1));
 }
 
+bool between(float p1, float b1, float b2)
+{
+    return p1 >= b1 && p1 <= b2 ||
+           p1 <= b1 && p1 >= b2;
+}
+
+/**
+ * RAY
+ */
+
+bool ray::intersects(box b)
+{
+    vec4 d1 = position - b.position;
+    vec4 d2 = position - (b.position + b.dimension);
+
+    return 0; //TODO
+}
+
+/**
+ * FACE
+ */
+
+vec4 face::getNormal()
+{
+    return (vertices[3] - vertices[0]).cross((vertices[1] - vertices[0])).normalized();
+}
+
+/**
+ * BOX
+ */
+
 bool box::collides2(box &o)
 {
     return overlaps(position.x, dimension.x, o.position.x, o.dimension.x) &&
@@ -47,6 +78,11 @@ bool box::collides3(box &o)
            overlaps(position.y, dimension.y, o.position.y, o.dimension.y) &&
            overlaps(position.z, dimension.z, o.position.z, o.dimension.z);
 
+    printf("%d %d %d\n",
+           overlaps(position.x, dimension.x, o.position.x, o.dimension.x),
+           overlaps(position.y, dimension.y, o.position.y, o.dimension.y),
+           overlaps(position.z, dimension.z, o.position.z, o.dimension.z));
+
     return ret;
 }
 
@@ -58,6 +94,47 @@ vec4 box::mtv3(box &o)
     r.z = mtd(position.z, dimension.z, o.position.z, o.dimension.z);
     r.w = 0;
     return r;
+}
+
+face box::getFace(int i)
+{
+    vec4 pos = position;
+    vec4 dim;
+    switch(i)
+    {
+        case 0:
+            dim = vec4(dimension.x, dimension.y, 0, 0);
+            break;
+
+        case 1:
+            pos.x += dimension.x;
+            dim = vec4(0, dimension.y, dimension.z, 0);
+            break;
+
+        case 2:
+            pos.x += dimension.x;
+            pos.z += dimension.z;
+            dim = vec4(-dimension.x, dimension.y, 0, 0);
+            break;
+
+        case 3:
+            pos.z += dimension.z;
+            dim = vec4(0, dimension.y, -dimension.z, 0);
+            break;
+
+        case 4:
+            pos.x += dimension.x;
+            dim = vec4(-dimension.x, 0, dimension.z, 0);
+            break;
+
+        case 5:
+            pos.y += dimension.y;
+            dim = vec4(dimension.x, 0, dimension.z, 0);
+            break;
+
+    }
+
+    return face(pos, dim);
 }
 
 void box::print()

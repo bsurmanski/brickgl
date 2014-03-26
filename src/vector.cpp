@@ -117,7 +117,7 @@ float vec4::lengthSq()
     return dot(*this);
 }
 
-vec4 vec4::cross(vec4 &v)
+vec4 vec4::cross(vec4 v)
 {
     vec4 ret;
     ret.x = y * v.z - z * v.y;
