@@ -69,7 +69,16 @@ bool Brick::flat()
 
 box Brick::getBox()
 {
-    return box(vec4(position), getMatrix() * vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0));
+    vec4 pos = getMatrix() * vec4(0,0,0,1);
+    vec4 dim = getMatrix() * vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0);
+    return box(pos, dim);
+}
+
+box Brick::pegBox(int i, int j)
+{
+    vec4 pos = getPegMatrix(i, j) * vec4(0,0,0,1);
+    vec4 dim = getPegMatrix(i, j) * vec4(7.99f, 9.599f, 7.99f, 0);
+    return box(pos, dim);
 }
 
 void Brick::init()
@@ -101,17 +110,14 @@ void Brick::init()
 
 }
 
-Brick::Brick(Type t, vec4 p) : position(p), type(t)
+Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false)
 {
     position = vec4(0,0,0,1);
     rotation = vec4(0,0,0,0);
     init();
 
-    connections = new std::pair<Brick*, float>[length() * width()];
-    for(int i = 0; i < length() * width(); i++)
-    {
-        connections[i] = std::pair<Brick*, float>(NULL, 0.0f);
-    }
+    pegs = new Peg[npegs()];
+    for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
 
 //TODO: rotation
@@ -151,14 +157,18 @@ GLTexture *Brick::getTexture(int i, int j)
 mat4 Brick::getMatrix()
 {
     return mat4::getTranslation(position) *
-            mat4::getRotation(rotation);
+
+        // XXX translation is to offset from peg to corner, so collision works right with rotation
+            mat4::getTranslation(vec4(4.0f, 0, 4.0f, 0)) *
+            mat4::getRotation(rotation) *
+            mat4::getTranslation(vec4(-4.0f, 0, -4.0f, 0));
 }
 
 mat4 Brick::getPegMatrix(unsigned i, unsigned j)
 {
     return mat4::getTranslation(position) *
         mat4::getRotation(rotation) *
-        mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
+        mat4::getTranslation(vec4(i * 8, 0, j * 8, 0));
 }
 
 void Brick::draw(DrawDevice *dev)
@@ -175,4 +185,27 @@ void Brick::draw(DrawDevice *dev)
                 this->getTexture(i, j), mMat);
         }
     }
+}
+
+void Brick::rupdate()
+{
+    tagged = true; // tag to prevent loops
+    for(int i = 0; i < npegs(); i++)
+    {
+        pegs[i].rupdate(); // will update all connected pegs
+    }
+}
+
+void Brick::rflip()
+{
+    tagged = false;
+    for(int i = 0; i < npegs(); i++)
+    {
+        pegs[i].rflip(); // will flip all connected pegs
+    }
+}
+
+bool Brick::connect(Brick *o)
+{
+    return false;
 }

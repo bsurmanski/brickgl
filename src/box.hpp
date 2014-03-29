@@ -109,6 +109,8 @@ class box
     bool collides3(box &o);
     vec4 mtv3(box &o);
 
+    vec4 offsetOf(vec4 v);
+
     face getFace(int i);
 
     void print();

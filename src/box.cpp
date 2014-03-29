@@ -96,6 +96,24 @@ vec4 box::mtv3(box &o)
     return r;
 }
 
+vec4 box::offsetOf(vec4 v)
+{
+    vec4 ret = vec4(0,0,0,0);
+    if(!between(v.x, position.x, position.x + dimension.x)){
+        ret.x = (v.x < position.x) ? v.x - position.x : (position.x + dimension.x) - v.x;
+    }
+
+    if(!between(v.y, position.y, position.y + dimension.y)){
+        ret.y = (v.y < position.y) ? v.y - position.y : (position.y + dimension.y) - v.y;
+    }
+
+    if(!between(v.z, position.z, position.z + dimension.z)){
+        ret.z = (v.z < position.z) ? v.z - position.z : (position.z + dimension.z) - v.z;
+    }
+
+    return ret;
+}
+
 face box::getFace(int i)
 {
     vec4 pos = position;

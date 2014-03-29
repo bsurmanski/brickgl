@@ -210,6 +210,22 @@ class MainApplication : public Application
         }
     }
 
+    Brick *findClosestBrick(vec4 p)
+    {
+        Brick *b = NULL;
+        float dist = -1.0f;
+        for(int i = 0; i < bricks.size(); i++)
+        {
+            if(!b || dist < bricks[i].getBox().offsetOf(p).length())
+            {
+                b = &bricks[i];
+                dist = bricks[i].getBox().offsetOf(p).length();
+            }
+        }
+
+        return b;
+    }
+
     void draw()
     {
         ((GLDrawDevice*)drawDevice)->lightBuffer->clear();
@@ -232,6 +248,9 @@ class MainApplication : public Application
         MOUSE.z = round(MOUSE.z / 8.0f) * 8.0f;
         if(MOUSE.x != NAN && MOUSE.y != NAN && MOUSE.z != NAN)
             target = MOUSE;
+
+        Brick *br = findClosestBrick(MOUSE);
+
 #endif
         cursor.draw(drawDevice);
 

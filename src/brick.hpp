@@ -17,13 +17,40 @@
 
 #include <vector>
 #include <array>
-//#include <pair>
 
 struct Brick
 {
     private:
     static bool isInit;
     static std::vector<Brick> brickTypes;
+
+    struct Peg
+    {
+        Peg *top;
+        Peg *bottom;
+        Brick *owner;
+
+        // pegs are automata, have buffered value
+        float value;
+        float back;
+
+        void rupdate() {
+            int n = 1 + !!top + !!bottom;
+            back = ((top ? top->value : 0) + (bottom ? bottom->value : 0) + value) / (float) n;
+
+            if(top && !top->owner->tagged) top->owner->rupdate();
+            if(bottom && !bottom->owner->tagged) bottom->owner->rupdate();
+        }
+
+        void rflip() {
+            value = back;
+            if(top && top->owner->tagged) top->rflip();
+            if(bottom && bottom->owner->tagged) top->rflip();
+        }
+
+        Peg() : owner(0), top(0), bottom(0), value(0) {}
+        Peg(Brick *o) : owner(o), top(0), bottom(0), value(0) {}
+    };
 
     public:
     static GLMesh *fullMesh;
@@ -38,7 +65,8 @@ struct Brick
 
     static void init();
 
-    std::pair<Brick *, float>* connections;
+    bool tagged; // brick has been visited
+    Peg *pegs;
 
     GLTexture *getTexture(int i, int j);
 
@@ -65,12 +93,19 @@ struct Brick
     unsigned width();
     bool flat();
 
+    int npegs() { return length() * width(); }
+
     box getBox();
+    box pegBox(int i, int j);
 
     void draw(DrawDevice *dev);
+    void rupdate();
+    void rflip();
+    bool connect(Brick *o);
 
     Brick(Type type, vec4 position);
-    Brick(){}
+    Brick() : pegs(0) {}
+    //~Brick() { if(pegs) delete[] pegs; }
 
     mat4 getMatrix();
     mat4 getPegMatrix(unsigned i, unsigned j);
@@ -85,5 +120,6 @@ struct Brick
 
     void rotate(vec4 r) { rotation = rotation + r; }
 };
+
 
 #endif
