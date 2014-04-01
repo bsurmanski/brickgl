@@ -7,6 +7,7 @@ uniform sampler2D t_depth;
 
 uniform vec4 camera;  // world space camera position
 uniform vec4 light; // world space light position
+uniform vec4 color;
 // uniform vec4 ads; // TODO ambient defuse specular properties
 // uniform vec4 color; // TODO light color
 
@@ -43,7 +44,7 @@ vec4 applyLighting()
     specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) * 
         (SPEC_POWER / length(light.xyz - position.xyz)); 
     
-    return vec4(vec3(difuse), specular); 
+    return vec4((difuse * color).xyz, specular); 
 }
 
 void main()

@@ -30,9 +30,15 @@ struct Brick
         Peg *bottom;
         Brick *owner;
 
+        int i;
+        int j;
+
         // pegs are automata, have buffered value
         float value;
         float back;
+
+        bool collides(Brick *b);
+        bool connects(Peg *p);
 
         void rupdate() {
             int n = 1 + !!top + !!bottom;
@@ -49,7 +55,7 @@ struct Brick
         }
 
         Peg() : owner(0), top(0), bottom(0), value(0) {}
-        Peg(Brick *o) : owner(o), top(0), bottom(0), value(0) {}
+        Peg(Brick *o, int x, int y) : owner(o), top(0), bottom(0), value(0), i(x), j(y)  {}
     };
 
     public:
@@ -99,6 +105,7 @@ struct Brick
     box pegBox(int i, int j);
 
     void draw(DrawDevice *dev);
+    void light(DrawDevice *dev);
     void rupdate();
     void rflip();
     bool connect(Brick *o);

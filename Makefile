@@ -53,3 +53,6 @@ all: $(SRC) $(GLSLH)
 clean:
 	rm -f brickgl
 	rm -f $(GLSLH)
+
+run: brickgl
+	./brickgl

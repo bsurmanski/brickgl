@@ -174,7 +174,7 @@ class MainApplication : public Application
 
         if(keystate[SDLK_3])
         {
-            cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
+            //cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
         }
 
         static int left = 0;
@@ -252,9 +252,18 @@ class MainApplication : public Application
         Brick *br = findClosestBrick(MOUSE);
 
 #endif
+        target.print();
+        printf("\n");
         cursor.draw(drawDevice);
 
         ((GLDrawDevice*)drawDevice)->applyLighting();
+
+        for(int i = 0; i < bricks.size(); i++)
+        {
+            Brick b = bricks[i];
+            b.light(drawDevice);
+        }
+
         ((GLDrawDevice*)drawDevice)->drawToScreen();
 
         brickMenu->draw(drawDevice);

@@ -16,6 +16,16 @@ GLTexture *Brick::outputTexture;
 GLTexture *Brick::input1Texture;
 GLTexture *Brick::input2Texture;
 
+bool Brick::Peg::collides(Brick *b)
+{
+
+}
+
+bool Brick::Peg::connects(Peg *p)
+{
+
+}
+
 unsigned Brick::width()
 {
     switch(type)
@@ -25,7 +35,7 @@ unsigned Brick::width()
         case BRICK_PLATE2x4:
             return 2;
         case BRICK_LED:
-            return 2;
+            return 1;
         case BRICK_WIRE8:
             return 1;
         case BRICK_PLATE32:
@@ -69,14 +79,14 @@ bool Brick::flat()
 
 box Brick::getBox()
 {
-    vec4 pos = getMatrix() * vec4(0,0,0,1);
+    vec4 pos = getMatrix() * vec4(-4.0,0,-4.0,1);
     vec4 dim = getMatrix() * vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0);
     return box(pos, dim);
 }
 
 box Brick::pegBox(int i, int j)
 {
-    vec4 pos = getPegMatrix(i, j) * vec4(0,0,0,1);
+    vec4 pos = getPegMatrix(i, j) * vec4(-4.0,0,-4.0,1);
     vec4 dim = getPegMatrix(i, j) * vec4(7.99f, 9.599f, 7.99f, 0);
     return box(pos, dim);
 }
@@ -117,7 +127,14 @@ Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false)
     init();
 
     pegs = new Peg[npegs()];
-    for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
+    for(int i = 0; i < width(); i++)
+    {
+        for(int j = 0; j < length(); j++)
+        {
+            pegs[i * length() + j] = Peg(this, i, j);
+        }
+    }
+    //for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
 
 //TODO: rotation
@@ -151,6 +168,11 @@ GLTexture *Brick::getTexture(int i, int j)
         if(i == 1) return input1Texture;
         return input2Texture;
     }
+    if(type == BRICK_LED)
+    {
+        if(i == 0) return powerTexture;
+        if(i == 1) return groundTexture;
+    }
     return groundTexture; //TODO other textures
 }
 
@@ -159,9 +181,9 @@ mat4 Brick::getMatrix()
     return mat4::getTranslation(position) *
 
         // XXX translation is to offset from peg to corner, so collision works right with rotation
-            mat4::getTranslation(vec4(4.0f, 0, 4.0f, 0)) *
-            mat4::getRotation(rotation) *
-            mat4::getTranslation(vec4(-4.0f, 0, -4.0f, 0));
+            //mat4::getTranslation(vec4(-4.0f, 0, -4.0f, 0)) *
+            mat4::getRotation(rotation);
+            //mat4::getTranslation(vec4(4.0f, 0, 4.0f, 0));
 }
 
 mat4 Brick::getPegMatrix(unsigned i, unsigned j)
@@ -185,6 +207,12 @@ void Brick::draw(DrawDevice *dev)
                 this->getTexture(i, j), mMat);
         }
     }
+}
+
+void Brick::light(DrawDevice *dev)
+{
+    if(type == BRICK_LED)
+        ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1));
 }
 
 void Brick::rupdate()

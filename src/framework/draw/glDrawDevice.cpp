@@ -168,11 +168,14 @@ void GLDrawDevice::applyLighting()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+    /*
     vec4 camPos = mat4::getRotation(camera.getRotation()) * (camera.getOffset());
     camPos.z = -camPos.z;
-    vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
+    vec4 color = vec4(1,1,1,1);
     lightProgram->setUniform("light", lightPos);
     lightProgram->setUniform("camera", camPos);
+    lightProgram->setUniform("color", color);
     lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
     lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
     lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
@@ -184,6 +187,31 @@ void GLDrawDevice::applyLighting()
 
     lightPos = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
     lightProgram->setUniform("light", lightPos);
+    this->drawFullscreenQuad();*/
+    drawLight(vec4(10.0f, 1000.0f, -500.0f, 1.0f), vec4(1,1,1,1), 0.9);
+    drawLight(vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f), vec4(1,1,1,1), 0.9);
+    drawLight(vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f),
+            vec4(1,1,1,1), 0.9);
+}
+
+void GLDrawDevice::drawLight(vec4 loc, vec4 color, float brightness)
+{
+    mat4 mMatrix = mat4::getTranslation(vec4(5,0,0,0));
+    mat4 vMatrix = camera.getView();
+    mat4 mvpMatrix = camera.getPerspective() * vMatrix * mMatrix;
+
+    lightProgram->use();
+    lightBuffer->bind();
+
+    vec4 camPos = mat4::getRotation(camera.getRotation()) * (camera.getOffset());
+    camPos.z = -camPos.z;
+
+    lightProgram->setUniform("light", loc);
+    lightProgram->setUniform("camera", camPos);
+    lightProgram->setUniform("color", color * brightness);
+    lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
+    lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
+    lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
     this->drawFullscreenQuad();
 }
 
