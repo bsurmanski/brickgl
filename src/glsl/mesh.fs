@@ -8,14 +8,17 @@ smooth in vec4 fnormal;
 smooth in vec2 fuv;
 
 uniform sampler2D t_color;
+uniform vec4 ambient;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outNormal; 
 layout(location = 2) out vec4 outPosition;
+layout(location = 3) out vec4 outLight; // mess!
 
 void main()
 {
     outColor = texture(t_color, fuv);
     outNormal = fnormal;
     outPosition = fposition;
+    outLight = ambient;
 }

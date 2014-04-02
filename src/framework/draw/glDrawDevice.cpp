@@ -60,10 +60,12 @@ GLDrawDevice::GLDrawDevice()
     height = 480;
     mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
 
+    GLTexture *lightTexture = new GLTexture(width, height, GLTexture::RGBA8);
     mainBuffer = new GLFramebuffer;
     mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8)); //color
     mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8I)); //normal
     mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA32F)); //position
+    mainBuffer->appendTarget(lightTexture);
     mainBuffer->setDepth(new GLTexture(width, height, GLTexture::DEPTH32)); // depth
 
     const char lightvs[] = {
@@ -77,7 +79,7 @@ GLDrawDevice::GLDrawDevice()
     lightProgram = GLDrawProgram::fromVFShaderStrings(lightvs, lightfs);
     lightProgram->setAccum(true);
     lightBuffer = new GLFramebuffer;
-    lightBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8));
+    lightBuffer->appendTarget(lightTexture);
 
     mainProgram->use();
 }
@@ -165,29 +167,10 @@ void GLDrawDevice::applyLighting()
 
     lightProgram->use();
     lightBuffer->bind();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
 
     vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
-    /*
-    vec4 camPos = mat4::getRotation(camera.getRotation()) * (camera.getOffset());
-    camPos.z = -camPos.z;
-    vec4 color = vec4(1,1,1,1);
-    lightProgram->setUniform("light", lightPos);
-    lightProgram->setUniform("camera", camPos);
-    lightProgram->setUniform("color", color);
-    lightProgram->bindTexture("t_normal", 0, mainBuffer->getTarget(1));
-    lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
-    lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
-    this->drawFullscreenQuad();
-
-    lightPos = vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f);
-    lightProgram->setUniform("light", lightPos);
-    this->drawFullscreenQuad();
-
-    lightPos = vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f);
-    lightProgram->setUniform("light", lightPos);
-    this->drawFullscreenQuad();*/
     drawLight(vec4(10.0f, 1000.0f, -500.0f, 1.0f), vec4(1,1,1,1), 0.9);
     drawLight(vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f), vec4(1,1,1,1), 0.9);
     drawLight(vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f),
@@ -226,6 +209,24 @@ void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
 
     mainProgram->setUniform("mvpMatrix", mvpMatrix);
     mainProgram->setUniform("mMatrix", mMatrix);
+    mainProgram->setUniform("ambient", vec4(0.2, 0.2, 0.2, 0));
+
+    mainProgram->bindTexture("t_color", 0, tex);
+    mainProgram->drawMesh(mesh);
+}
+
+void GLDrawDevice::drawMeshUnlit(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
+{
+    mat4 vMatrix = camera.getView();
+
+    mat4 mvpMatrix = camera.getPerspective() * vMatrix * mMatrix;
+
+    mainProgram->use();
+    mainBuffer->bind();
+
+    mainProgram->setUniform("mvpMatrix", mvpMatrix);
+    mainProgram->setUniform("mMatrix", mMatrix);
+    mainProgram->setUniform("ambient", vec4(1,1,1,0));
 
     mainProgram->bindTexture("t_color", 0, tex);
     mainProgram->drawMesh(mesh);

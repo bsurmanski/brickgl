@@ -120,7 +120,7 @@ void Brick::init()
 
 }
 
-Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false)
+Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false), value(0.0f)
 {
     position = vec4(0,0,0,1);
     rotation = vec4(0,0,0,0);
@@ -203,15 +203,20 @@ void Brick::draw(DrawDevice *dev)
                 mat4::getTranslation(position) *
                 mat4::getRotation(rotation) *
                 mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
+            if(type == BRICK_LED && isActive()) {
+            ((GLDrawDevice*)dev)->drawMeshUnlit(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
+            } else {
             ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
                 this->getTexture(i, j), mMat);
+            }
         }
     }
 }
 
 void Brick::light(DrawDevice *dev)
 {
-    if(type == BRICK_LED)
+    if(type == BRICK_LED && isActive())
         ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1));
 }
 

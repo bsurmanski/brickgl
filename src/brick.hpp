@@ -88,6 +88,7 @@ struct Brick
         BRICK_PLATE2x4
     };
 
+    float value;
     bool is2Input();
 
     Type type;
@@ -109,9 +110,10 @@ struct Brick
     void rupdate();
     void rflip();
     bool connect(Brick *o);
+    bool isActive() { return value > 0.1f; }
 
     Brick(Type type, vec4 position);
-    Brick() : pegs(0) {}
+    Brick() : pegs(0), value(0.0f) {}
     //~Brick() { if(pegs) delete[] pegs; }
 
     mat4 getMatrix();

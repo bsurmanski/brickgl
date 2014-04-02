@@ -15,8 +15,6 @@ vec4 normal;
 vec4 depth;
 vec4 light;
 
-float AMBIENT = 0.25f;
-
 vec4 applyLighting(vec4 c, vec4 l)
 {
     return vec4((vec3(l) * vec3(c)) + vec3(l.a), 1.0);    
@@ -27,7 +25,7 @@ void main()
     color = texture(t_color, fuv);
     normal = texture(t_normal, fuv);
     depth = texture(t_depth, fuv);
-    light = texture(t_light, fuv) + vec4(vec3(AMBIENT), 0);
+    light = texture(t_light, fuv);
     
     outColor = applyLighting(color, light);
 }

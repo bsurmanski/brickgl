@@ -38,6 +38,7 @@ class GLDrawDevice : public DrawDevice
     virtual void applyLighting();
     virtual void drawLight(vec4 loc, vec4 color, float brightness=1.0f);
     virtual void drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix);
+    virtual void drawMeshUnlit(GLMesh *mesh, GLTexture *tex, mat4 mMatrix);
     virtual void drawFlat(GLTexture *tex, vec4 loc, vec4 scale = vec4(1,1,1,1));
 };
 

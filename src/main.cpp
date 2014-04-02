@@ -41,6 +41,8 @@ static unsigned HEIGHT = 480;
 int mousex;
 int mousey;
 
+bool placeActive = false;
+
 class MainApplication : public Application
 {
     bool isRunning;
@@ -85,6 +87,7 @@ class MainApplication : public Application
 
         if(!collision)
         {
+            if(placeActive) b.value = 1.0f;
             bricks.push_back(b);
             return true;
         }
@@ -175,6 +178,11 @@ class MainApplication : public Application
         if(keystate[SDLK_3])
         {
             //cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
+        }
+
+        if(keystate[SDLK_e])
+        {
+            placeActive = !placeActive;
         }
 
         static int left = 0;
