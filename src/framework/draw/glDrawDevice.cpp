@@ -171,10 +171,10 @@ void GLDrawDevice::applyLighting()
     //glClear(GL_COLOR_BUFFER_BIT);
 
     vec4 lightPos = vec4(10.0f, 1000.0f, -500.0f, 1.0f);
-    drawLight(vec4(10.0f, 1000.0f, -500.0f, 1.0f), vec4(1,1,1,1), 0.9);
-    drawLight(vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f), vec4(1,1,1,1), 0.9);
+    drawLight(vec4(10.0f, 1000.0f, -500.0f, 1.0f), vec4(1,1,1,1), 0.5);
+    drawLight(vec4(sin(angle) * -10.0f, 10.0f, -10.0f, 1.0f), vec4(1,1,1,1), 0.3);
     drawLight(vec4(sin(angle) * 10.0f + 30.0f, sin(angle) * 10.0f + 10.0f, -10.0f, 1.0f),
-            vec4(1,1,1,1), 0.9);
+            vec4(1,1,1,1), 0.3);
 }
 
 void GLDrawDevice::drawLight(vec4 loc, vec4 color, float brightness)
@@ -209,7 +209,7 @@ void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
 
     mainProgram->setUniform("mvpMatrix", mvpMatrix);
     mainProgram->setUniform("mMatrix", mMatrix);
-    mainProgram->setUniform("ambient", vec4(0.2, 0.2, 0.2, 0));
+    mainProgram->setUniform("ambient", vec4(0.1, 0.1, 0.1, 0));
 
     mainProgram->bindTexture("t_color", 0, tex);
     mainProgram->drawMesh(mesh);

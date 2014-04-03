@@ -20,6 +20,8 @@ vec4 normal;
 vec4 position;
 vec4 depth;
 
+float DIST_SCALE = 100.0f;
+
 vec4 applyLighting()
 {
     float SPECULARITY = 0.5;
@@ -42,7 +44,7 @@ vec4 applyLighting()
     );
 
     specular = clamp(SPECULARITY * pow(dot(normal.xyz, h), 32.0f), 0.0f, 1.0f) * 
-        (SPEC_POWER / length(light.xyz - position.xyz)); 
+        (SPEC_POWER / (length(light.xyz - position.xyz) * DIST_SCALE)); 
     
     return vec4((difuse * color).xyz, specular); 
 }

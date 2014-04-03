@@ -92,11 +92,10 @@ void GLDrawProgram::use()
     if(isAccum)
     {
         glBlendEquation(GL_FUNC_ADD);
-        glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
+        glBlendFunc(GL_ONE, GL_ONE);
     } else
     {
         glBlendEquation(GL_FUNC_ADD);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendFunc(GL_ONE, GL_ZERO);
     }
 

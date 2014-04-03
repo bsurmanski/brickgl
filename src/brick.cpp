@@ -217,7 +217,7 @@ void Brick::draw(DrawDevice *dev)
 void Brick::light(DrawDevice *dev)
 {
     if(type == BRICK_LED && isActive())
-        ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1));
+        ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1), 0.4);
 }
 
 void Brick::rupdate()
