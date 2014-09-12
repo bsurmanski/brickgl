@@ -137,10 +137,20 @@ Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false), value(0.0f)
     //for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
 
-//TODO: rotation
-bool Brick::collides(Brick &b2)
+Brick::Brick(Brick &oth) :
+    position(oth.position),
+    rotation(oth.rotation),
+    type(oth.type),
+    tagged(oth.tagged),
+    value(oth.value)
 {
-    box o = b2.getBox();
+
+}
+
+//TODO: rotation
+bool Brick::collides(Brick *b2)
+{
+    box o = b2->getBox();
     getBox().print();
     o.print();
     return getBox().collides3(o);

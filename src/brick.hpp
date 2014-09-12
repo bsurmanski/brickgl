@@ -113,6 +113,7 @@ struct Brick
     bool isActive() { return value > 0.1f; }
 
     Brick(Type type, vec4 position);
+    Brick(Brick &);
     Brick() : pegs(0), value(0.0f) {}
     //~Brick() { if(pegs) delete[] pegs; }
 
@@ -125,7 +126,7 @@ struct Brick
     float back() { return position.z; }
     float top() { return position.y + 9.599f; } // TODO: check virtical size
     float bottom() { return position.y; }
-    bool collides(Brick &b2);
+    bool collides(Brick *b2);
 
     void rotate(vec4 r) { rotation = rotation + r; }
 };

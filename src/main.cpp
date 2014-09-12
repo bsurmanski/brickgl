@@ -46,9 +46,9 @@ bool placeActive = false;
 class MainApplication : public Application
 {
     bool isRunning;
-    std::vector<Brick> bricks;
+    std::vector<Brick*> bricks;
     Camera *camera;
-    Brick cursor;
+    Brick* cursor;
     BrickMenu *brickMenu;
 
     public:
@@ -57,7 +57,7 @@ class MainApplication : public Application
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
-        cursor = Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+        cursor = new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
         isRunning = true;
 
         camera = &((GLDrawDevice*)drawDevice)->camera;
@@ -72,12 +72,12 @@ class MainApplication : public Application
 
     bool tryPlaceBrick()
     {
-        Brick b = cursor;
-        b.position = target;
+        Brick *b = cursor;
+        b->position = target;
         bool collision = false;
         for(int i = 0; i < bricks.size(); i++)
         {
-            if(b.collides(bricks[i]))
+            if(b->collides(bricks[i]))
             {
                 printf("collision\n");
                 collision = true;
@@ -87,8 +87,8 @@ class MainApplication : public Application
 
         if(!collision)
         {
-            if(placeActive) b.value = 1.0f;
-            bricks.push_back(b);
+            if(placeActive) b->value = 1.0f;
+            bricks.push_back(new Brick(*b));
             return true;
         }
 
@@ -162,17 +162,20 @@ class MainApplication : public Application
 
         if(keystate[SDLK_1])
         {
-            cursor = Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+            delete cursor;
+            cursor = new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
         }
 
         if(keystate[SDLK_2])
         {
-            cursor = Brick(Brick::BRICK_WIRE8, vec4(0,0,0,1));
+            delete cursor;
+            cursor = new Brick(Brick::BRICK_WIRE8, vec4(0,0,0,1));
         }
 
         if(keystate[SDLK_3])
         {
-            cursor = Brick(Brick::BRICK_LED, vec4(0,0,0,1));
+            delete cursor;
+            cursor = new Brick(Brick::BRICK_LED, vec4(0,0,0,1));
         }
 
         if(keystate[SDLK_3])
@@ -189,20 +192,20 @@ class MainApplication : public Application
         static int right = 0;
         if(keystate[SDLK_LEFT] && !left)
         {
-            cursor.rotate(vec4(0,M_PI / 2.0f,0,0));
+            cursor->rotate(vec4(0,M_PI / 2.0f,0,0));
         }
 
         if(keystate[SDLK_RIGHT] && !right)
         {
-            cursor.rotate(vec4(0,M_PI / 2.0f,0,0));
+            cursor->rotate(vec4(0,M_PI / 2.0f,0,0));
         }
         left = keystate[SDLK_LEFT];
         right = keystate[SDLK_RIGHT];
 
-        cursor.position = cursor.position + ((target - cursor.position) * 0.25f);
-        if(cursor.position.distanceSq(target) > 1000 * 1000)
+        cursor->position = cursor->position + ((target - cursor->position) * 0.25f);
+        if(cursor->position.distanceSq(target) > 1000 * 1000)
         {
-            cursor.position = target;
+            cursor->position = target;
         }
     }
 
@@ -224,10 +227,10 @@ class MainApplication : public Application
         float dist = -1.0f;
         for(int i = 0; i < bricks.size(); i++)
         {
-            if(!b || dist < bricks[i].getBox().offsetOf(p).length())
+            if(!b || dist < bricks[i]->getBox().offsetOf(p).length())
             {
-                b = &bricks[i];
-                dist = bricks[i].getBox().offsetOf(p).length();
+                b = bricks[i];
+                dist = bricks[i]->getBox().offsetOf(p).length();
             }
         }
 
@@ -242,8 +245,8 @@ class MainApplication : public Application
         drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
         for(int i = 0; i < bricks.size(); i++)
         {
-            Brick b = bricks[i];
-            b.draw(drawDevice);
+            Brick *b = bricks[i];
+            b->draw(drawDevice);
         }
 
 #define MOUSESUPPORT
@@ -262,14 +265,14 @@ class MainApplication : public Application
 #endif
         target.print();
         printf("\n");
-        cursor.draw(drawDevice);
+        cursor->draw(drawDevice);
 
         ((GLDrawDevice*)drawDevice)->applyLighting();
 
         for(int i = 0; i < bricks.size(); i++)
         {
-            Brick b = bricks[i];
-            b.light(drawDevice);
+            Brick *b = bricks[i];
+            b->light(drawDevice);
         }
 
         ((GLDrawDevice*)drawDevice)->drawToScreen();
