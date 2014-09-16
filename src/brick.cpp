@@ -120,7 +120,7 @@ void Brick::init()
 
 }
 
-Brick::Brick(Type t, vec4 p) : position(p), type(t), tagged(false), value(0.0f)
+Brick::Brick(Type t, vec4 p) : position(p), type(t), value(0.0f)
 {
     position = vec4(0,0,0,1);
     rotation = vec4(0,0,0,0);
@@ -141,7 +141,6 @@ Brick::Brick(Brick &oth) :
     position(oth.position),
     rotation(oth.rotation),
     type(oth.type),
-    tagged(oth.tagged),
     value(oth.value)
 {
 
@@ -226,29 +225,30 @@ void Brick::draw(DrawDevice *dev)
 
 void Brick::light(DrawDevice *dev)
 {
-    if(type == BRICK_LED && isActive())
-        ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1), 0.4);
 }
 
-void Brick::rupdate()
+void Brick::update()
 {
-    tagged = true; // tag to prevent loops
     for(int i = 0; i < npegs(); i++)
     {
-        pegs[i].rupdate(); // will update all connected pegs
+        pegs[i].update(); // will update all connected pegs
     }
 }
 
-void Brick::rflip()
+void Brick::flip()
 {
-    tagged = false;
     for(int i = 0; i < npegs(); i++)
     {
-        pegs[i].rflip(); // will flip all connected pegs
+        pegs[i].flip(); // will flip all connected pegs
     }
 }
 
 bool Brick::connect(Brick *o)
 {
     return false;
+}
+
+void LEDBrick::light(DrawDevice *dev) {
+    if(isActive())
+        ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1), 0.4);
 }

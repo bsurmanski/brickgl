@@ -18,7 +18,7 @@
 #include <vector>
 #include <array>
 
-struct Brick
+class Brick
 {
     private:
     static bool isInit;
@@ -40,18 +40,13 @@ struct Brick
         bool collides(Brick *b);
         bool connects(Peg *p);
 
-        void rupdate() {
+        void update() {
             int n = 1 + !!top + !!bottom;
             back = ((top ? top->value : 0) + (bottom ? bottom->value : 0) + value) / (float) n;
-
-            if(top && !top->owner->tagged) top->owner->rupdate();
-            if(bottom && !bottom->owner->tagged) bottom->owner->rupdate();
         }
 
-        void rflip() {
+        void flip() {
             value = back;
-            if(top && top->owner->tagged) top->rflip();
-            if(bottom && bottom->owner->tagged) top->rflip();
         }
 
         Peg() : owner(0), top(0), bottom(0), value(0) {}
@@ -71,7 +66,6 @@ struct Brick
 
     static void init();
 
-    bool tagged; // brick has been visited
     Peg *pegs;
 
     GLTexture *getTexture(int i, int j);
@@ -96,21 +90,22 @@ struct Brick
     vec4 position;
     vec4 rotation;
 
-    unsigned length();
-    unsigned width();
-    bool flat();
 
     int npegs() { return length() * width(); }
 
     box getBox();
     box pegBox(int i, int j);
 
-    void draw(DrawDevice *dev);
-    void light(DrawDevice *dev);
-    void rupdate();
-    void rflip();
+    virtual unsigned length();
+    virtual unsigned width();
+    virtual bool flat();
+
+    virtual void draw(DrawDevice *dev);
+    virtual void light(DrawDevice *dev);
+    virtual void update();
+    virtual void flip();
     bool connect(Brick *o);
-    bool isActive() { return value > 0.1f; }
+    virtual bool isActive() { return value > 0.1f; }
 
     Brick(Type type, vec4 position);
     Brick(Brick &);
@@ -131,5 +126,35 @@ struct Brick
     void rotate(vec4 r) { rotation = rotation + r; }
 };
 
+class ORBrick : public Brick {
+    public:
+    virtual void update();
+    virtual unsigned length() { return 4; }
+    virtual unsigned width() { return 2; }
+    virtual bool flat() { return false; }
+};
+
+class ANDBrick : public Brick {
+    public:
+    virtual void update();
+    virtual unsigned length() { return 4; }
+    virtual unsigned width() { return 2; }
+    virtual bool flat() { return false; }
+};
+
+class Wire8Brick : public Brick {
+    public:
+    virtual void update();
+    virtual unsigned length() { return 8; }
+    virtual unsigned width() { return 1; }
+    virtual bool flat() { return false; }
+};
+
+class LEDBrick : public Brick {
+    public:
+    virtual bool isActive() { return value > 0.1f; }
+    virtual void update();
+    virtual void light(DrawDevice *dev);
+};
 
 #endif
