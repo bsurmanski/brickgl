@@ -96,18 +96,19 @@ class Brick
     box getBox();
     box pegBox(int i, int j);
 
-    virtual unsigned length();
-    virtual unsigned width();
-    virtual bool flat();
+    virtual unsigned length() = 0;
+    virtual unsigned width() = 0;
+    virtual bool flat() { return false; }
 
     virtual void draw(DrawDevice *dev);
-    virtual void light(DrawDevice *dev);
-    virtual void update();
+    virtual void light(DrawDevice *dev) {}
+    virtual void update() {}
     virtual void flip();
     bool connect(Brick *o);
     virtual bool isActive() { return value > 0.1f; }
+    virtual Brick *copy() = 0;
 
-    Brick(Type type, vec4 position);
+    Brick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0), float value=0.0f);
     Brick(Brick &);
     Brick() : pegs(0), value(0.0f) {}
     //~Brick() { if(pegs) delete[] pegs; }
@@ -128,33 +129,44 @@ class Brick
 
 class ORBrick : public Brick {
     public:
-    virtual void update();
+    ORBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
+    virtual void update() {}
     virtual unsigned length() { return 4; }
     virtual unsigned width() { return 2; }
     virtual bool flat() { return false; }
+    Brick *copy() { return new ORBrick(position, rotation); }
 };
 
 class ANDBrick : public Brick {
     public:
-    virtual void update();
+    ANDBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
+    virtual void update() {}
     virtual unsigned length() { return 4; }
     virtual unsigned width() { return 2; }
     virtual bool flat() { return false; }
+    Brick *copy() { return new ANDBrick(position, rotation); }
 };
 
 class Wire8Brick : public Brick {
     public:
-    virtual void update();
+    Wire8Brick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
+    virtual void update() {}
     virtual unsigned length() { return 8; }
     virtual unsigned width() { return 1; }
     virtual bool flat() { return false; }
+    Brick *copy() { return new Wire8Brick(position, rotation); }
 };
 
 class LEDBrick : public Brick {
     public:
+    LEDBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
     virtual bool isActive() { return value > 0.1f; }
-    virtual void update();
+    virtual void update() {}
     virtual void light(DrawDevice *dev);
+    virtual void draw(DrawDevice *dev);
+    virtual unsigned length() { return 2; }
+    virtual unsigned width() { return 1; }
+    Brick *copy() { return new LEDBrick(position, rotation); }
 };
 
 #endif

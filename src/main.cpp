@@ -57,7 +57,7 @@ class MainApplication : public Application
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
-        cursor = new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+        cursor = new ANDBrick(vec4(0,0,0,1));//new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
         isRunning = true;
 
         camera = &((GLDrawDevice*)drawDevice)->camera;
@@ -88,7 +88,7 @@ class MainApplication : public Application
         if(!collision)
         {
             if(placeActive) b->value = 1.0f;
-            bricks.push_back(new Brick(*b));
+            bricks.push_back(b->copy());
             return true;
         }
 
@@ -163,19 +163,19 @@ class MainApplication : public Application
         if(keystate[SDLK_1])
         {
             delete cursor;
-            cursor = new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+            cursor = new ANDBrick();
         }
 
         if(keystate[SDLK_2])
         {
             delete cursor;
-            cursor = new Brick(Brick::BRICK_WIRE8, vec4(0,0,0,1));
+            cursor = new Wire8Brick();
         }
 
         if(keystate[SDLK_3])
         {
             delete cursor;
-            cursor = new Brick(Brick::BRICK_LED, vec4(0,0,0,1));
+            cursor = new LEDBrick();
         }
 
         if(keystate[SDLK_3])

@@ -26,6 +26,7 @@ bool Brick::Peg::connects(Peg *p)
 
 }
 
+/*
 unsigned Brick::width()
 {
     switch(type)
@@ -76,6 +77,7 @@ bool Brick::flat()
             return false;
     }
 }
+*/
 
 box Brick::getBox()
 {
@@ -120,12 +122,13 @@ void Brick::init()
 
 }
 
-Brick::Brick(Type t, vec4 p) : position(p), type(t), value(0.0f)
+
+Brick::Brick(vec4 p, vec4 r, float v) : position(p), rotation(r), value(v)
 {
-    position = vec4(0,0,0,1);
-    rotation = vec4(0,0,0,0);
     init();
 
+    pegs = NULL;
+    /*
     pegs = new Peg[npegs()];
     for(int i = 0; i < width(); i++)
     {
@@ -133,7 +136,7 @@ Brick::Brick(Type t, vec4 p) : position(p), type(t), value(0.0f)
         {
             pegs[i * length() + j] = Peg(this, i, j);
         }
-    }
+    }*/
     //for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
 
@@ -212,28 +215,20 @@ void Brick::draw(DrawDevice *dev)
                 mat4::getTranslation(position) *
                 mat4::getRotation(rotation) *
                 mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
-            if(type == BRICK_LED && isActive()) {
-            ((GLDrawDevice*)dev)->drawMeshUnlit(flat() ? flatMesh : fullMesh,
-                this->getTexture(i, j), mMat);
-            } else {
             ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
                 this->getTexture(i, j), mMat);
-            }
         }
     }
 }
 
-void Brick::light(DrawDevice *dev)
-{
-}
-
+/*
 void Brick::update()
 {
     for(int i = 0; i < npegs(); i++)
     {
         pegs[i].update(); // will update all connected pegs
     }
-}
+}*/
 
 void Brick::flip()
 {
@@ -248,7 +243,29 @@ bool Brick::connect(Brick *o)
     return false;
 }
 
+void LEDBrick::draw(DrawDevice *dev)
+{
+    for(int j = 0; j < width(); j++)
+    {
+        for(int i = 0; i < length(); i++)
+        {
+            mat4 mMat =
+                mat4::getTranslation(position) *
+                mat4::getRotation(rotation) *
+                mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
+            if(isActive()) {
+            ((GLDrawDevice*)dev)->drawMeshUnlit(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
+            } else {
+            ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
+            }
+        }
+    }
+}
+
 void LEDBrick::light(DrawDevice *dev) {
+    value = 1; //XXX temporary to turn light on
     if(isActive())
         ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1), 0.4);
 }
