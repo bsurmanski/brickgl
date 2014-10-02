@@ -16,6 +16,7 @@ GLTexture *Brick::outputTexture;
 GLTexture *Brick::input1Texture;
 GLTexture *Brick::input2Texture;
 
+/*
 bool Brick::Peg::collides(Brick *b)
 {
 
@@ -24,60 +25,7 @@ bool Brick::Peg::collides(Brick *b)
 bool Brick::Peg::connects(Peg *p)
 {
 
-}
-
-/*
-unsigned Brick::width()
-{
-    switch(type)
-    {
-        case BRICK_AND:
-        case BRICK_OR:
-        case BRICK_PLATE2x4:
-            return 2;
-        case BRICK_LED:
-            return 1;
-        case BRICK_WIRE8:
-            return 1;
-        case BRICK_PLATE32:
-            return 32;
-        default: return 1;
-    }
-}
-
-unsigned Brick::length()
-{
-    switch(type)
-    {
-        case BRICK_AND:
-        case BRICK_OR:
-        case BRICK_PLATE2x4:
-            return 4;
-        case BRICK_LED:
-            return 2;
-        case BRICK_WIRE8:
-            return 8;
-        case BRICK_PLATE32:
-            return 32;
-        default: return 1;
-    }
-}
-
-bool Brick::flat()
-{
-    switch(type)
-    {
-        case BRICK_PLATE2x4:
-        case BRICK_PLATE32:
-            return true;
-
-        case BRICK_WIRE8:
-            //return true;
-        default:
-            return false;
-    }
-}
-*/
+}*/
 
 box Brick::getBox()
 {
@@ -127,7 +75,6 @@ Brick::Brick(vec4 p, vec4 r, float v) : position(p), rotation(r), value(v)
 {
     init();
 
-    pegs = NULL;
     /*
     pegs = new Peg[npegs()];
     for(int i = 0; i < width(); i++)
@@ -140,6 +87,7 @@ Brick::Brick(vec4 p, vec4 r, float v) : position(p), rotation(r), value(v)
     //for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
 
+/*
 Brick::Brick(Brick &oth) :
     position(oth.position),
     rotation(oth.rotation),
@@ -147,7 +95,7 @@ Brick::Brick(Brick &oth) :
     value(oth.value)
 {
 
-}
+} */
 
 //TODO: rotation
 bool Brick::collides(Brick *b2)
@@ -172,20 +120,7 @@ bool Brick::is2Input()
 
 GLTexture *Brick::getTexture(int i, int j)
 {
-    if(is2Input())
-    {
-        if(i == 0) return powerTexture;
-        if(i == 3) return groundTexture;
-        if(j == 1) return outputTexture;
-        if(i == 1) return input1Texture;
-        return input2Texture;
-    }
-    if(type == BRICK_LED)
-    {
-        if(i == 0) return powerTexture;
-        if(i == 1) return groundTexture;
-    }
-    return groundTexture; //TODO other textures
+    return groundTexture;
 }
 
 mat4 Brick::getMatrix()
@@ -221,21 +156,13 @@ void Brick::draw(DrawDevice *dev)
     }
 }
 
-/*
-void Brick::update()
-{
-    for(int i = 0; i < npegs(); i++)
-    {
-        pegs[i].update(); // will update all connected pegs
-    }
-}*/
-
 void Brick::flip()
 {
+    /*
     for(int i = 0; i < npegs(); i++)
     {
         pegs[i].flip(); // will flip all connected pegs
-    }
+    }*/
 }
 
 bool Brick::connect(Brick *o)

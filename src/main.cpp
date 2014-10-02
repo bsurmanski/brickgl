@@ -57,7 +57,7 @@ class MainApplication : public Application
     {
         window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
-        cursor = new ANDBrick(vec4(0,0,0,1));//new Brick(Brick::BRICK_AND, vec4(0,0,0,1));
+        cursor = new ANDBrick(vec4(0,0,0,1));
         isRunning = true;
 
         camera = &((GLDrawDevice*)drawDevice)->camera;
@@ -288,7 +288,7 @@ class MainApplication : public Application
     {
         for(int i = 0; i < bricks.size(); i++)
         {
-
+            bricks[i]->update();
         }
 
         SDL_Delay(32);

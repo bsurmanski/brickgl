@@ -22,36 +22,6 @@ class Brick
 {
     private:
     static bool isInit;
-    static std::vector<Brick> brickTypes;
-
-    struct Peg
-    {
-        Peg *top;
-        Peg *bottom;
-        Brick *owner;
-
-        int i;
-        int j;
-
-        // pegs are automata, have buffered value
-        float value;
-        float back;
-
-        bool collides(Brick *b);
-        bool connects(Peg *p);
-
-        void update() {
-            int n = 1 + !!top + !!bottom;
-            back = ((top ? top->value : 0) + (bottom ? bottom->value : 0) + value) / (float) n;
-        }
-
-        void flip() {
-            value = back;
-        }
-
-        Peg() : owner(0), top(0), bottom(0), value(0) {}
-        Peg(Brick *o, int x, int y) : owner(o), top(0), bottom(0), value(0), i(x), j(y)  {}
-    };
 
     public:
     static GLMesh *fullMesh;
@@ -66,9 +36,9 @@ class Brick
 
     static void init();
 
-    Peg *pegs;
+    //Peg *pegs;
 
-    GLTexture *getTexture(int i, int j);
+    virtual GLTexture *getTexture(int i, int j);
 
 
     enum Type
@@ -90,7 +60,6 @@ class Brick
     vec4 position;
     vec4 rotation;
 
-
     int npegs() { return length() * width(); }
 
     box getBox();
@@ -109,27 +78,47 @@ class Brick
     virtual Brick *copy() = 0;
 
     Brick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0), float value=0.0f);
-    Brick(Brick &);
-    Brick() : pegs(0), value(0.0f) {}
+    //Brick(Brick &);
+    Brick() : value(0.0f) {}
     //~Brick() { if(pegs) delete[] pegs; }
 
     mat4 getMatrix();
     mat4 getPegMatrix(unsigned i, unsigned j);
 
+    //XXX dimensions should be 8x8x9.6, trimmed for allow space in collision detection
     float left() { return position.x; }
-    float right() { return position.x + length() * 7.99f; }
-    float front() { return position.z - width() * 7.99f; } //TODO: check front vs back
+    float right() { return position.x + length() * 7.900f; }
+    float front() { return position.z - width() * 7.900f; } //TODO: check front vs back
     float back() { return position.z; }
-    float top() { return position.y + 9.599f; } // TODO: check virtical size
+    float top() { return position.y + 9.500f; } // TODO: check virtical size
     float bottom() { return position.y; }
     bool collides(Brick *b2);
 
     void rotate(vec4 r) { rotation = rotation + r; }
 };
 
-class ORBrick : public Brick {
+class TwoInputBrick : public Brick {
+    Brick *input1;
+    Brick *input2;
     public:
-    ORBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
+    TwoInputBrick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0), float value=0.0f)
+        : Brick(position, rotation, value), input1(0), input2(0) {}
+
+    virtual GLTexture *getTexture(int i, int j)
+    {
+        if(i == 0) return powerTexture;
+        if(i == 3) return groundTexture;
+        if(j == 1) return outputTexture;
+        if(i == 1) return input1Texture;
+        return input2Texture;
+    }
+};
+
+class ORBrick : public TwoInputBrick {
+    public:
+    ORBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) :
+        TwoInputBrick(pos, rot)
+    {}
     virtual void update() {}
     virtual unsigned length() { return 4; }
     virtual unsigned width() { return 2; }
@@ -137,9 +126,11 @@ class ORBrick : public Brick {
     Brick *copy() { return new ORBrick(position, rotation); }
 };
 
-class ANDBrick : public Brick {
+class ANDBrick : public TwoInputBrick {
     public:
-    ANDBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {}
+    ANDBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) :
+        TwoInputBrick(pos, rot)
+    {}
     virtual void update() {}
     virtual unsigned length() { return 4; }
     virtual unsigned width() { return 2; }
@@ -155,6 +146,11 @@ class Wire8Brick : public Brick {
     virtual unsigned width() { return 1; }
     virtual bool flat() { return false; }
     Brick *copy() { return new Wire8Brick(position, rotation); }
+
+    virtual GLTexture *getTexture(int i, int j)
+    {
+        return groundTexture;
+    }
 };
 
 class LEDBrick : public Brick {
@@ -167,6 +163,13 @@ class LEDBrick : public Brick {
     virtual unsigned length() { return 2; }
     virtual unsigned width() { return 1; }
     Brick *copy() { return new LEDBrick(position, rotation); }
+
+    virtual GLTexture *getTexture(int i, int j)
+    {
+        if(i == 0) return powerTexture;
+        if(i == 1) return groundTexture;
+        return NULL;
+    }
 };
 
 #endif
