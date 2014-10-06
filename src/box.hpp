@@ -4,6 +4,7 @@
 #include "vector.hpp"
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 class box;
 
@@ -61,7 +62,7 @@ class box
     public:
 
     box(vec4 p, vec4 d) : position(p), dimension(d) {
-        if(dimension.z < 0)
+        if(dimension.y < 0)
         {
             printf("\n:");
             this->print();
@@ -69,26 +70,37 @@ class box
         if(dimension.x < 0)
         {
             position.x = position.x + dimension.x;
-            dimension.x = -dimension.x;
+            dimension.x = fabs(dimension.x);
         }
 
         if(dimension.y < 0)
         {
             position.y = position.y + dimension.y;
-            dimension.y = -dimension.y;
+            dimension.y = fabs(dimension.y);
         }
 
         if(dimension.z < 0)
         {
             position.z = position.z + dimension.z;
-            dimension.z = -dimension.z;
+            dimension.z = fabs(dimension.z);
         }
 
         if(dimension.w < 0)
         {
-            position.w += dimension.w;
-            dimension.w = -dimension.w;
+            position.w = position.w + dimension.w;
+            dimension.w = fabs(dimension.w);
         }
+    }
+
+    //shrinks the box by 'f' in all dimensions to allow for
+    // slight error
+    void trim(float f) {
+        position.x += f;
+        position.y += f;
+        position.z += f;
+        dimension.x -= f;
+        dimension.y -= f;
+        dimension.z -= f;
     }
 
     void setPosition(vec4 p) { position = p; }
@@ -114,6 +126,12 @@ class box
     face getFace(int i);
 
     void print();
+
+/*
+#include "framework/draw/glDrawDevice.hpp"
+#include "framework/draw/mesh.hpp"
+    void debugDraw(DrawDevice *dev);
+*/
 
     friend ray;
 

@@ -163,3 +163,26 @@ void box::print()
     dimension.print();
     std::cout << " }" << std::endl;
 }
+
+/*
+void box::debugDraw(DrawDevice *dev) {
+    Mesh m;
+    m.addVert(MeshPosition(position.x, position.y, position.z));
+    m.addVert(MeshPosition(position.x+dimension.x, position.y, position.z));
+    m.addVert(MeshPosition(position.x+dimension.x, position.y+dimension.y, position.z));
+    m.addVert(MeshPosition(position.x, position.y+dimension.y, position.z));
+
+    m.addVert(MeshPosition(position.x, position.y, position.z+dimension.z));
+    m.addVert(MeshPosition(position.x+dimension.x, position.y, position.z+dimension.z));
+    m.addVert(MeshPosition(position.x+dimension.x, position.y+dimension.y, position.z+dimension.z));
+    m.addVert(MeshPosition(position.x, position.y+dimension.y, position.z+dimension.z));
+    m.addFace(MeshFace(0,2,1));
+    m.addFace(MeshFace(0,3,2));
+    m.addFace(MeshFace(4,6,5));
+    m.addFace(MeshFace(4,7,6));
+    m.addNorm(MeshNormal(0,0,1));
+    m.addUv(MeshUv(0,0));
+    GLMesh glm(m);
+    ((GLDrawDevice*)dev)->drawMeshUnlit(&glm, NULL, mat4());
+}
+*/

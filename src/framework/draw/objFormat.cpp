@@ -77,9 +77,9 @@ Mesh objLoad(std::string filenm)
                     &vi[1], &ui[1], &ni[1],
                     &vi[2], &ui[2], &ni[2]);
 
-            MeshFace face = { vi[0] - 1, vi[1] - 1, vi[2] - 1,
+            MeshFace face(vi[0] - 1, vi[1] - 1, vi[2] - 1,
                                 ni[0] - 1, ni[1] - 1, ni[2] - 1,
-                                ui[0] - 1, ui[1] - 1, ui[2] - 1};
+                                ui[0] - 1, ui[1] - 1, ui[2] - 1);
 
             m.faces.push_back(face);
         } else if(c == 'm')

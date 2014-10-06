@@ -29,14 +29,23 @@ bool Brick::Peg::connects(Peg *p)
 
 box Brick::getBox()
 {
-    vec4 pos = getMatrix() * vec4(-4.0,0,-4.0,1);
-    vec4 dim = getMatrix() * vec4(length() * 7.99f, 9.599f, width() * 7.99f, 0);
-    return box(pos, dim);
+    // offset by half a lego unit to align to pegs
+    vec4 pos = getMatrix() * vec4(-4.0f,0,-4.0f,1);
+    vec4 dim = getMatrix() * vec4(length() * 8.0f,
+                                  9.5f,
+                                  width() * 8.0f, 0);
+
+
+    // trim by 0.1 in each dimension to provide
+    // a bit of buffer room for FP error and the like
+    box b(pos, dim);
+    b.trim(0.1f);
+    return b;
 }
 
 box Brick::pegBox(int i, int j)
 {
-    vec4 pos = getPegMatrix(i, j) * vec4(-4.0,0,-4.0,1);
+    vec4 pos = getPegMatrix(i, j) * vec4(-4.0, 0, -4.0, 1);
     vec4 dim = getPegMatrix(i, j) * vec4(7.99f, 9.599f, 7.99f, 0);
     return box(pos, dim);
 }
@@ -101,8 +110,6 @@ Brick::Brick(Brick &oth) :
 bool Brick::collides(Brick *b2)
 {
     box o = b2->getBox();
-    getBox().print();
-    o.print();
     return getBox().collides3(o);
 }
 
@@ -154,6 +161,8 @@ void Brick::draw(DrawDevice *dev)
                 this->getTexture(i, j), mMat);
         }
     }
+
+    //pegBox(0, 0).debugDraw(dev);
 }
 
 void Brick::flip()

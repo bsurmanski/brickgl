@@ -26,7 +26,28 @@ struct MeshFace
     unsigned short v[3]; //vert
     unsigned short n[3]; //normal
     unsigned short uv[3]; //uv
-    //MeshFace(unsigned short a, unsigned short b, unsigned short c);
+    MeshFace(unsigned short a, unsigned short b, unsigned short c) {
+        v[0] = a;
+        v[1] = b;
+        v[2] = c;
+        n[0] = n[1] = n[2] = 0;
+        uv[0] = uv[1] = uv[2] = 0;
+    }
+
+    MeshFace(unsigned short v0, unsigned short v1, unsigned short v2,
+            unsigned short n0, unsigned short n1, unsigned short n2,
+            unsigned short uv0, unsigned short uv1, unsigned short uv2) {
+        v[0] = v0;
+        v[1] = v1;
+        v[2] = v2;
+        n[0] = n0;
+        n[1] = n1;
+        n[2] = n2;
+        uv[0] = uv0;
+        uv[1] = uv1;
+        uv[2] = uv2;
+    }
+
 };
 
 class Mesh

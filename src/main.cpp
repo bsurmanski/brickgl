@@ -80,6 +80,8 @@ class MainApplication : public Application
             if(b->collides(bricks[i]))
             {
                 printf("collision\n");
+                b->getBox().print();
+                bricks[i]->getBox().print();
                 collision = true;
                 break;
             }
@@ -263,8 +265,8 @@ class MainApplication : public Application
         Brick *br = findClosestBrick(MOUSE);
 
 #endif
-        target.print();
-        printf("\n");
+        //target.print();
+        //printf("\n");
         cursor->draw(drawDevice);
 
         ((GLDrawDevice*)drawDevice)->applyLighting();
