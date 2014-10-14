@@ -4,6 +4,13 @@
 #include "framework/draw/objFormat.hpp"
 #include "framework/draw/pngFormat.hpp"
 
+#define LEGO_UNIT 1.6
+#define LEGO_STDHEIGHT (6*LEGO_UNIT)
+#define LEGO_STDWIDTH (5*LEGO_UNIT)
+#define LEGO_SHORTHEIGHT (2*LEGO_UNIT)
+#define LEGO_PEGHEIGHT LEGO_UNIT
+#define LEGO_HALFWIDTH 4.0
+
 bool Brick::isInit = false;
 
 GLMesh *Brick::fullMesh;
@@ -30,10 +37,10 @@ bool Brick::Peg::connects(Peg *p)
 box Brick::getBox()
 {
     // offset by half a lego unit to align to pegs
-    vec4 pos = getMatrix() * vec4(-4.0f,0,-4.0f,1);
-    vec4 dim = getMatrix() * vec4(length() * 8.0f,
-                                  9.5f,
-                                  width() * 8.0f, 0);
+    vec4 pos = getMatrix() * vec4(-LEGO_HALFWIDTH, 0, -LEGO_HALFWIDTH, 1);
+    vec4 dim = getMatrix() * vec4(length() * LEGO_STDWIDTH,
+                                  LEGO_STDHEIGHT,
+                                  width() * LEGO_STDWIDTH, 0);
 
 
     // trim by 0.1 in each dimension to provide
@@ -45,9 +52,11 @@ box Brick::getBox()
 
 box Brick::pegBox(int i, int j)
 {
-    vec4 pos = getPegMatrix(i, j) * vec4(-4.0, 0, -4.0, 1);
-    vec4 dim = getPegMatrix(i, j) * vec4(7.99f, 9.599f, 7.99f, 0);
-    return box(pos, dim);
+    vec4 pos = getPegMatrix(i, j) * vec4(-LEGO_HALFWIDTH, 0, -LEGO_HALFWIDTH, 1);
+    vec4 dim = getPegMatrix(i, j) * vec4(LEGO_STDWIDTH, LEGO_STDHEIGHT + LEGO_PEGHEIGHT, LEGO_STDWIDTH, 0);
+    box pbox(pos, dim);
+    pbox.trim(0.1f);
+    return pbox;
 }
 
 void Brick::init()
@@ -125,11 +134,6 @@ bool Brick::is2Input()
     }
 }
 
-GLTexture *Brick::getTexture(int i, int j)
-{
-    return groundTexture;
-}
-
 mat4 Brick::getMatrix()
 {
     return mat4::getTranslation(position) *
@@ -167,16 +171,57 @@ void Brick::draw(DrawDevice *dev)
 
 void Brick::flip()
 {
-    /*
-    for(int i = 0; i < npegs(); i++)
-    {
-        pegs[i].flip(); // will flip all connected pegs
-    }*/
+    // TODO: update?
 }
 
+// when calling this function, we assume that the bricks are positioned
+// adequately (the bricks are touching but not colliding, or not touching at all).
+// If the bricks are intersecting, garbage connections will be made.
 bool Brick::connect(Brick *o)
 {
+    // collect connections made so we can assert validity
+    std::vector<std::pair<PegInfo*, PegInfo*>> connections;
+
+    // 4 nested loops? O(n^4) is a dreadful algorithmic bound!
+    // but, since we are working with such small numbers,
+    // (bricks likely being 2*4 at largest)
+    // and since this get called only once rarely, we should be fine.
+    //
+    // i/j iterator for self, x/y iterator for other
+    for(int i = 0; i < length(); i++) {
+        for(int j = 0; j < width(); j++) {
+            for(int x = 0; x < o->length(); x++) {
+                for(int y = 0; y < o->width(); y++) {
+                    box obox = o->pegBox(x, y);
+                    // these pegs are connected
+                    if(pegBox(i, j).collides3(obox)) {
+                        PegInfo *pi = getPegInfo(i, j);
+                        PegInfo *pio = o->getPegInfo(x, y);
+                        if(!pi->connect(pio) || ! pio->connect(pi)) {
+                            goto ERR;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+
+ERR:
+    disconnect(o);
+    o->disconnect(this);
     return false;
+}
+
+void Brick::disconnect(Brick *o) {
+    int i = 0;
+    PegInfo *pi;
+    while((pi = getPegInfo(i++))) {
+        if(pi->connected && pi->connected->owner == o) {
+            pi->connected->disconnect();
+            pi->disconnect();
+        }
+    }
 }
 
 void LEDBrick::draw(DrawDevice *dev)

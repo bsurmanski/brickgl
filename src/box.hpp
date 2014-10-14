@@ -127,12 +127,6 @@ class box
 
     void print();
 
-/*
-#include "framework/draw/glDrawDevice.hpp"
-#include "framework/draw/mesh.hpp"
-    void debugDraw(DrawDevice *dev);
-*/
-
     friend ray;
 
 };

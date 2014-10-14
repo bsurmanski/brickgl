@@ -77,6 +77,10 @@ class MainApplication : public Application
         bool collision = false;
         for(int i = 0; i < bricks.size(); i++)
         {
+            if(!b->connect(bricks[i])) {
+                printf("invalid connection\n");
+            }
+
             if(b->collides(bricks[i]))
             {
                 printf("collision\n");
