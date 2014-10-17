@@ -89,31 +89,10 @@ void Brick::init()
 }
 
 
-Brick::Brick(vec4 p, vec4 r, float v) : position(p), rotation(r), value(v)
+Brick::Brick(vec4 p, vec4 r) : position(p), rotation(r)
 {
     init();
-
-    /*
-    pegs = new Peg[npegs()];
-    for(int i = 0; i < width(); i++)
-    {
-        for(int j = 0; j < length(); j++)
-        {
-            pegs[i * length() + j] = Peg(this, i, j);
-        }
-    }*/
-    //for(int i = 0; i < npegs(); i++) pegs[i] = Peg(this);
 }
-
-/*
-Brick::Brick(Brick &oth) :
-    position(oth.position),
-    rotation(oth.rotation),
-    type(oth.type),
-    value(oth.value)
-{
-
-} */
 
 //TODO: rotation
 bool Brick::collides(Brick *b2)
@@ -169,11 +148,6 @@ void Brick::draw(DrawDevice *dev)
     //pegBox(0, 0).debugDraw(dev);
 }
 
-void Brick::flip()
-{
-    // TODO: update?
-}
-
 // when calling this function, we assume that the bricks are positioned
 // adequately (the bricks are touching but not colliding, or not touching at all).
 // If the bricks are intersecting, garbage connections will be made.
@@ -197,7 +171,7 @@ bool Brick::connect(Brick *o)
                     if(pegBox(i, j).collides3(obox)) {
                         PegInfo *pi = getPegInfo(i, j);
                         PegInfo *pio = o->getPegInfo(x, y);
-                        if(!pi->connect(pio) || ! pio->connect(pi)) {
+                        if(!pi->connect(pio) || !pio->connect(pi)) {
                             goto ERR;
                         }
                     }
@@ -246,7 +220,6 @@ void LEDBrick::draw(DrawDevice *dev)
 }
 
 void LEDBrick::light(DrawDevice *dev) {
-    value = 1; //XXX temporary to turn light on
     if(isActive())
         ((GLDrawDevice*)dev)->drawLight(position + vec4(2,6,2), vec4(1,1,1), 0.4);
 }

@@ -75,10 +75,12 @@ class MainApplication : public Application
         Brick *b = cursor;
         b->position = target;
         bool collision = false;
-        for(int i = 0; i < bricks.size(); i++)
+        int i;
+        for(i = 0; i < bricks.size(); i++)
         {
             if(!b->connect(bricks[i])) {
                 printf("invalid connection\n");
+                goto ERR;
             }
 
             if(b->collides(bricks[i]))
@@ -87,16 +89,23 @@ class MainApplication : public Application
                 b->getBox().print();
                 bricks[i]->getBox().print();
                 collision = true;
-                break;
+                goto ERR;
             }
         }
 
         if(!collision)
         {
-            if(placeActive) b->value = 1.0f;
-            bricks.push_back(b->copy());
+            //if(placeActive) b->value = 1.0f;
+            bricks.push_back(b);
+            cursor = cursor->copy();
             return true;
         }
+
+ERR:
+    for(int j = i; j >= 0; j--) {
+        b->disconnect(bricks[j]);
+        return false;
+    }
 
         return false;
     }
@@ -295,6 +304,11 @@ class MainApplication : public Application
         for(int i = 0; i < bricks.size(); i++)
         {
             bricks[i]->update();
+        }
+
+        // once values are updated, we can flip value buffers
+        for(int i = 0; i < bricks.size(); i++) {
+            bricks[i]->flip();
         }
 
         SDL_Delay(32);

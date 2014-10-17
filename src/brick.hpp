@@ -20,6 +20,7 @@
 
 class Brick;
 struct PegInfo {
+    unsigned refcount;
     enum PegType {
         INPUT,
         OUTPUT,
@@ -34,6 +35,9 @@ struct PegInfo {
     int x;
     int y;
 
+    float buffer;
+    float value;
+
     PegInfo *connected;
 
     PegInfo(Brick *own, PegType t, int n, int _x, int _y) {
@@ -42,8 +46,61 @@ struct PegInfo {
         typeId = n;
         x = _x;
         y = _y;
+        value = 0.0f;
         connected = NULL;
+        refcount = 1;
     }
+
+    unsigned retain() {
+        refcount++;
+    }
+
+    unsigned release() {
+        refcount--;
+        if(refcount <= 0) {
+            delete this; // suicide!
+            return 0;
+        }
+
+        return refcount;
+    }
+
+    void update() {
+        switch(type) {
+            case GROUND:
+                buffer = 0.0f;
+                break;
+            case POWER:
+                buffer = 1.0f;
+                break;
+            case INPUT:
+                if(connected) buffer = connected->value;
+                else buffer = 0.0f;
+                break;
+            case INOUT: //TODO: figure out them wires
+            case OUTPUT:
+                buffer = 0.0f;
+                break;
+        }
+    }
+
+    void setValue(float f) {
+        // peg value is double buffered
+        buffer = f;
+    }
+
+    float getValue() {
+        return value;
+    }
+
+    bool isActive() {
+        return value > 0.5f;
+    }
+
+    void flip() {
+        value = buffer;
+    }
+
 
     bool connect(PegInfo *o) {
         if(owner == o->owner) return false; //cannot connect to self
@@ -103,7 +160,6 @@ class Brick
         BRICK_PLATE2x4
     };
 
-    float value;
     bool is2Input();
 
     Type type;
@@ -123,11 +179,10 @@ class Brick
     virtual void draw(DrawDevice *dev);
     virtual void light(DrawDevice *dev) {}
     virtual void update() {}
-    virtual void flip();
+    virtual void flip() {}
     bool connect(Brick *o);
     bool connectPeg(int peg, Brick *o, int pego);
     void disconnect(Brick *o);
-    virtual bool isActive() { return value > 0.1f; }
     virtual Brick *copy() = 0;
     virtual PegInfo *getPegInfo(int x, int y)=0;
 
@@ -165,8 +220,8 @@ class Brick
         return getTypedPeg(PegInfo::POWER, n);
     }
 
-    Brick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0), float value=0.0f);
-    Brick() : value(0.0f) {}
+    Brick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0));
+    Brick() {}
     virtual ~Brick() {}
 
     mat4 getMatrix();
@@ -178,6 +233,7 @@ class Brick
 };
 
 class TwoInputBrick : public Brick {
+    protected:
     PegInfo *pegVcc;
     PegInfo *pegIn0;
     PegInfo *pegIn1;
@@ -185,8 +241,8 @@ class TwoInputBrick : public Brick {
     PegInfo *pegOut;
 
     public:
-    TwoInputBrick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0), float value=0.0f)
-        : Brick(position, rotation, value) {
+    TwoInputBrick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0))
+        : Brick(position, rotation) {
             pegVcc = new PegInfo(this, PegInfo::POWER, 0, 0, 0);
             pegIn0 = new PegInfo(this, PegInfo::INPUT, 0, 1, 0);
             pegIn1 = new PegInfo(this, PegInfo::INPUT, 1, 2, 0);
@@ -195,11 +251,11 @@ class TwoInputBrick : public Brick {
         }
 
     virtual ~TwoInputBrick() {
-        delete pegVcc;
-        delete pegIn0;
-        delete pegIn1;
-        delete pegGnd;
-        delete pegOut;
+        pegVcc->release();
+        pegIn0->release();
+        pegIn1->release();
+        pegGnd->release();
+        pegOut->release();
     }
 
     virtual unsigned length() { return 4; }
@@ -219,6 +275,14 @@ class TwoInputBrick : public Brick {
         }
         return NULL;
     }
+
+    virtual void flip() {
+        pegVcc->flip();
+        pegGnd->flip();
+        pegIn0->flip();
+        pegIn1->flip();
+        pegOut->flip();
+    }
 };
 
 class ORBrick : public TwoInputBrick {
@@ -226,9 +290,17 @@ class ORBrick : public TwoInputBrick {
     ORBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) :
         TwoInputBrick(pos, rot)
     {}
-    virtual void update() {}
     virtual bool flat() { return false; }
     Brick *copy() { return new ORBrick(position, rotation); }
+
+    virtual void update() {
+        pegVcc->setValue(1.0f);
+        pegGnd->setValue(0.0f);
+        pegIn0->update();
+        pegIn1->update();
+        pegOut->setValue(pegIn0->isActive() || pegIn1->isActive());
+    }
+
 };
 
 class ANDBrick : public TwoInputBrick {
@@ -236,33 +308,50 @@ class ANDBrick : public TwoInputBrick {
     ANDBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) :
         TwoInputBrick(pos, rot)
     {}
-    virtual void update() {}
     virtual bool flat() { return false; }
     Brick *copy() { return new ANDBrick(position, rotation); }
+
+    virtual void update() {
+        pegVcc->setValue(1.0f);
+        pegGnd->setValue(0.0f);
+        pegIn0->update();
+        pegIn1->update();
+        pegOut->setValue(pegIn0->isActive() && pegIn1->isActive());
+    }
 };
 
 class Wire8Brick : public Brick {
-    PegInfo *pegWire;
+    PegInfo *pegWire[8];
 
     public:
     Wire8Brick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {
-        pegWire = new PegInfo(this, PegInfo::INOUT, 0, 0, 0);
+        for(int i = 0; i < 8; i++) {
+            pegWire[i] = new PegInfo(this, PegInfo::INOUT, 0, i, 0);
+        }
     }
 
     virtual ~Wire8Brick() {
-        delete pegWire;
+        for(int i = 0; i < 8; i++)
+            pegWire[i]->release();
     }
 
-    virtual void update() {}
+    virtual void update() {
+        for(int i = 0; i < 8; i++) {
+            pegWire[i]->update();
+        }
+    }
     virtual unsigned length() { return 8; }
     virtual unsigned width() { return 1; }
     virtual bool flat() { return false; }
     Brick *copy() { return new Wire8Brick(position, rotation); }
     virtual PegInfo *getPegInfo(int x, int y) {
         if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL; // invalid
-        return pegWire;
+        return pegWire[x];
     }
 
+    virtual void flip() {
+        //TODO: set value of pegs
+    }
 };
 
 class LEDBrick : public Brick {
@@ -276,22 +365,35 @@ class LEDBrick : public Brick {
     }
 
     virtual ~LEDBrick() {
-        delete pegIn0;
-        delete pegGnd;
+        pegIn0->release();
+        pegGnd->release();
     }
 
-    virtual bool isActive() { return value > 0.1f; }
-    virtual void update() {}
+    virtual bool isActive() { return pegIn0->isActive(); }
     virtual void light(DrawDevice *dev);
     virtual void draw(DrawDevice *dev);
     virtual unsigned length() { return 2; }
     virtual unsigned width() { return 1; }
-    Brick *copy() { return new LEDBrick(position, rotation); }
+
+    Brick *copy() {
+        return new LEDBrick(position, rotation);
+    }
+
     virtual PegInfo *getPegInfo(int x, int y) {
         if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL; // invalid
         if(x == 0) return pegIn0;
         if(x == 1) return pegGnd;
         return NULL;
+    }
+
+    virtual void update() {
+        pegIn0->update();
+        pegGnd->update();
+    }
+
+    virtual void flip() {
+        pegIn0->flip();
+        pegGnd->flip();
     }
 
 };
