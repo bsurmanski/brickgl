@@ -16,7 +16,6 @@
 #include "framework/draw/glDrawDevice.hpp"
 
 #include <vector>
-#include <array>
 
 class Brick;
 struct PegInfo {

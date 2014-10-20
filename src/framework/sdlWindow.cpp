@@ -14,12 +14,14 @@ SDLWindow::SDLWindow(uint32_t w, uint32_t h, std::string name) : Window(w, h, na
 SDLWindow::~SDLWindow()
 {
     SDL_Quit();
-    this->~Window();
+    //this->~Window();
 }
 
 void SDLWindow::swapBuffers()
 {
+    SDL_GL_SwapBuffers();
     SDL_Flip(screen);
+    SDL_Delay(32);
 }
 
 void SDLWindow::clear()

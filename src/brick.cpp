@@ -154,7 +154,7 @@ void Brick::draw(DrawDevice *dev)
 bool Brick::connect(Brick *o)
 {
     // collect connections made so we can assert validity
-    std::vector<std::pair<PegInfo*, PegInfo*>> connections;
+    std::vector<std::pair<PegInfo*, PegInfo*> > connections;
 
     // 4 nested loops? O(n^4) is a dreadful algorithmic bound!
     // but, since we are working with such small numbers,

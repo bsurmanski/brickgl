@@ -19,7 +19,7 @@
 #include "framework/application.hpp"
 #include "framework/draw/glDrawDevice.hpp"
 #include "framework/draw/glDrawProgram.hpp"
-#include "framework/sdlWindow.hpp"
+#include "framework/qtWindow.hpp"
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "brick.hpp"
@@ -31,6 +31,7 @@
 #include "framework/draw/objFormat.hpp"
 #include "framework/draw/pngFormat.hpp"
 
+#include <qt/QtWidgets/QApplication>
 #include <vector>
 
 vec4 target;
@@ -53,9 +54,10 @@ class MainApplication : public Application
 
     public:
 
-    MainApplication()
+    MainApplication(int argc, char **argv)
     {
-        window = new SDLWindow(WIDTH, HEIGHT, "BrickSim");
+        QApplication qapp(argc, argv);
+        window = new QtWindow(WIDTH, HEIGHT, "BrickSim");
         drawDevice = new GLDrawDevice();
         cursor = new ANDBrick(vec4(0,0,0,1));
         isRunning = true;
@@ -295,7 +297,6 @@ ERR:
         brickMenu->draw(drawDevice);
         drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
 
-        SDL_GL_SwapBuffers();
         window->swapBuffers();
     }
 
@@ -310,8 +311,6 @@ ERR:
         for(int i = 0; i < bricks.size(); i++) {
             bricks[i]->flip();
         }
-
-        SDL_Delay(32);
     }
 
     void run()
@@ -327,7 +326,7 @@ ERR:
 
 int main(int argc, char **argv)
 {
-    MainApplication app;
+    MainApplication app(argc, argv);
     app.run();
     return 0;
 }
