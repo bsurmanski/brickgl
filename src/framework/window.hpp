@@ -6,6 +6,7 @@
 
 #include "draw/drawDevice.hpp"
 
+class Application;
 class Window
 {
     uint32_t width;
@@ -15,7 +16,7 @@ class Window
     DrawDevice *draw;
 
     public:
-    Window(uint32_t w, uint32_t h, std::string name);
+    Window(Application *app, uint32_t w, uint32_t h, std::string name);
     virtual ~Window();
     virtual void swapBuffers() = 0;
     virtual void clear() = 0;

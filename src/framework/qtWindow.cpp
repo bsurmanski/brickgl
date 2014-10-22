@@ -2,43 +2,64 @@
 
 #include <qt/QtOpenGL/QtOpenGL>
 
-class QtWindowWidget : public QGLWidget {
+#include "application.hpp"
+
+class GLFrame : public QGLWidget, protected QGLFunctions {
+    Application *app;
+    QBasicTimer timer;
+
     public:
-    QtWindowWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+    GLFrame(Application *_app, QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+        app = _app;
+        setMinimumSize(320, 240);
     }
 
-    ~QtWindowWidget() {
+    virtual ~GLFrame() {
+    }
+
+    QSize sizeHint() {
+        return QSize(640, 480);
     }
 
     void initializeGL() {
+        initializeGLFunctions();
+        app->init();
+        timer.start(32, this);
     }
 
     void resizeGL(int w, int h) {
+        glViewport(0, 0, w, h);
     }
 
     void paintGL() {
+        app->draw();
     }
 
-    void timerEvent(QTimerEvent *) {
+    void timerEvent(QTimerEvent *event) {
         update();
+        app->update(32);
     }
 
-    void mousePressEvent(QMouseEvent *) {
+    void mousePressEvent(QMouseEvent *event) {
     }
 
-    void mouseReleaseEvent(QMouseEvent *) {
+    void mouseReleaseEvent(QMouseEvent *event) {
     }
 };
 
-QtWindow::QtWindow(uint32_t w, uint32_t h, std::string name) : Window(w, h, name) {
-    widget = new QtWindowWidget(0);
+QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
+    : Window(app, w, h, name)
+{
+    //setWindowTitle(name);
+    widget = new GLFrame(app, 0);
+    widget->show();
 }
 
 QtWindow::~QtWindow() {
 }
 
-
 void QtWindow::swapBuffers() {
+    widget->swapBuffers();
 }
 
 void QtWindow::clear() {

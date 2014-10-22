@@ -42,8 +42,6 @@ static unsigned HEIGHT = 480;
 int mousex;
 int mousey;
 
-bool placeActive = false;
-
 class MainApplication : public Application
 {
     bool isRunning;
@@ -54,10 +52,15 @@ class MainApplication : public Application
 
     public:
 
-    MainApplication(int argc, char **argv)
-    {
-        QApplication qapp(argc, argv);
-        window = new QtWindow(WIDTH, HEIGHT, "BrickSim");
+    MainApplication(int argc, char **argv) {
+        drawDevice = NULL;
+        cursor = NULL;
+        isRunning = false;
+        camera = NULL;
+        brickMenu = NULL;
+    }
+
+    virtual void init() {
         drawDevice = new GLDrawDevice();
         cursor = new ANDBrick(vec4(0,0,0,1));
         isRunning = true;
@@ -97,7 +100,6 @@ class MainApplication : public Application
 
         if(!collision)
         {
-            //if(placeActive) b->value = 1.0f;
             bricks.push_back(b);
             cursor = cursor->copy();
             return true;
@@ -110,6 +112,11 @@ ERR:
     }
 
         return false;
+    }
+
+    void mouseMove(float x, float y) {
+        mousex = x;
+        mousey = y;
     }
 
     void input()
@@ -198,11 +205,6 @@ ERR:
         if(keystate[SDLK_3])
         {
             //cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
-        }
-
-        if(keystate[SDLK_e])
-        {
-            placeActive = !placeActive;
         }
 
         static int left = 0;
@@ -300,7 +302,7 @@ ERR:
         window->swapBuffers();
     }
 
-    void update()
+    void update(float dt)
     {
         for(int i = 0; i < bricks.size(); i++)
         {
@@ -318,15 +320,33 @@ ERR:
         while(isRunning)
         {
             input();
-            update();
+            update(32);
             draw();
         }
     }
 };
 
+class QtApplication : public MainApplication {
+    QApplication app;
+
+    public:
+    QtApplication(int argc, char **argv) : MainApplication(argc, argv), app(argc, argv) {
+    }
+
+    // called by GLFrame, hanging out with QtWindow
+    void init() {
+        MainApplication::init();
+    }
+
+    void run() {
+        window = new QtWindow(this, WIDTH, HEIGHT, "BrickSim");
+        app.exec();
+    }
+};
+
 int main(int argc, char **argv)
 {
-    MainApplication app(argc, argv);
+    QtApplication app(argc, argv);
     app.run();
     return 0;
 }

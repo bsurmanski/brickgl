@@ -86,7 +86,6 @@ GLDrawDevice::GLDrawDevice()
 
 GLDrawDevice::~GLDrawDevice()
 {
-    this->~DrawDevice();
 }
 
 void GLDrawDevice::bindTexture(unsigned unit, GLTexture *tex)

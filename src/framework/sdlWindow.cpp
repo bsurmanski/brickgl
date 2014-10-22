@@ -1,6 +1,6 @@
 #include "sdlWindow.hpp"
 
-SDLWindow::SDLWindow(uint32_t w, uint32_t h, std::string name) : Window(w, h, name)
+SDLWindow::SDLWindow(Application *app, uint32_t w, uint32_t h, std::string name) : Window(app, w, h, name)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);

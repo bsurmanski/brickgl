@@ -9,7 +9,7 @@ class SDLWindow : public Window
     SDL_Surface *screen;
 
     public:
-    SDLWindow(uint32_t w, uint32_t h, std::string name);
+    SDLWindow(Application *app, uint32_t w, uint32_t h, std::string name);
     virtual ~SDLWindow();
     virtual void swapBuffers();
     virtual void clear();

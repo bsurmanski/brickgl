@@ -5,13 +5,15 @@
 
 #include <string>
 
-class QtWindowWidget;
+#include <qt/QtGui/QtGui>
+
+class GLFrame;
 
 class QtWindow : public Window {
-    QtWindowWidget *widget;
+    GLFrame *widget;
 
     public:
-    QtWindow(uint32_t w, uint32_t h, std::string name);
+    QtWindow(Application *app, uint32_t w, uint32_t h, std::string name);
     virtual ~QtWindow();
     virtual void swapBuffers();
     virtual void clear();

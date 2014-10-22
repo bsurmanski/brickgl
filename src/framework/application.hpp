@@ -14,6 +14,14 @@ class Application
     Application(){}
     Application(Window *window, DrawDevice *ddev);
     virtual ~Application();
+
+    DrawDevice *getDrawDevice() { return drawDevice; }
+
+    virtual void init() {}
+    virtual void input() {}
+    virtual void draw() {}
+    virtual void update(float dt) {}
+    virtual void run() {}
 };
 
 #endif
