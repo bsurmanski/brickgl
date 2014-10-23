@@ -114,7 +114,11 @@ ERR:
         return false;
     }
 
-    void mouseMove(float x, float y) {
+    void mouseMove(int x, int y) {
+        int xrel = mousex - x;
+        int yrel = mousey - y;
+        camera->addRotation(vec4( yrel / 100.0f,
+                                 -xrel / 100.0f, 0, 0));
         mousex = x;
         mousey = y;
     }

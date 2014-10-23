@@ -17,6 +17,8 @@ class Application
 
     DrawDevice *getDrawDevice() { return drawDevice; }
 
+    virtual void mouseMove(int x, int y) {}
+
     virtual void init() {}
     virtual void input() {}
     virtual void draw() {}

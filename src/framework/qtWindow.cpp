@@ -12,6 +12,7 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
     GLFrame(Application *_app, QWidget *parent) : QGLWidget(parent) {
         app = _app;
         setMinimumSize(320, 240);
+        setMouseTracking(true);
     }
 
     virtual ~GLFrame() {
@@ -39,7 +40,13 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
 
     void timerEvent(QTimerEvent *event) {
         update();
+        app->input();
         app->update(32);
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) {
+        app->mouseMove(event->x(), event->y());
+        printf("MOVE\n");
     }
 
     void mousePressEvent(QMouseEvent *event) {
