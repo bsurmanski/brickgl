@@ -9,7 +9,7 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
     QBasicTimer timer;
 
     public:
-    GLFrame(Application *_app, QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+    GLFrame(Application *_app, QWidget *parent) : QGLWidget(parent) {
         app = _app;
         setMinimumSize(320, 240);
     }
@@ -23,12 +23,14 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
 
     void initializeGL() {
         initializeGLFunctions();
+        makeCurrent();
         app->init();
         timer.start(32, this);
     }
 
     void resizeGL(int w, int h) {
         glViewport(0, 0, w, h);
+        glScissor(0, 0, w, h);
     }
 
     void paintGL() {
@@ -52,6 +54,7 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
 {
     //setWindowTitle(name);
     widget = new GLFrame(app, 0);
+    widget->resize(QSize(640, 480));
     widget->show();
 }
 
