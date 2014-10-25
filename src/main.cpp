@@ -17,6 +17,7 @@
 #include <GL/glext.h>
 
 #include "framework/application.hpp"
+#include "framework/input/qtInputDevice.hpp"
 #include "framework/draw/glDrawDevice.hpp"
 #include "framework/draw/glDrawProgram.hpp"
 #include "framework/qtWindow.hpp"
@@ -39,9 +40,6 @@ vec4 target;
 static unsigned WIDTH = 640;
 static unsigned HEIGHT = 480;
 
-int mousex;
-int mousey;
-
 class MainApplication : public Application
 {
     bool isRunning;
@@ -54,6 +52,7 @@ class MainApplication : public Application
 
     MainApplication(int argc, char **argv) {
         drawDevice = NULL;
+        inputDevice = NULL;
         cursor = NULL;
         isRunning = false;
         camera = NULL;
@@ -114,116 +113,73 @@ ERR:
         return false;
     }
 
-    void mouseMove(int x, int y) {
-        int xrel = mousex - x;
-        int yrel = mousey - y;
-        camera->addRotation(vec4( yrel / 100.0f,
-                                 -xrel / 100.0f, 0, 0));
-        mousex = x;
-        mousey = y;
-    }
-
     void input()
     {
-        uint8_t *keystate;
-        SDL_Event event;
+        //TODO: scroll zoom in/out
+        //camera->addOffset(vec4(0,0,5,0));
+        //camera->addOffset(vec4(0,0,-5,0));
 
-        static bool rclick = 0;
-        while(SDL_PollEvent(&event))
-        {
-            switch(event.type)
-            {
-                case SDL_QUIT:
-                    isRunning = false;
-                    break;
-                case SDL_MOUSEMOTION:
-                    if(rclick)
-                    {
-                        camera->addRotation(vec4( event.motion.yrel / 100.0f,
-                                                 -event.motion.xrel / 100.0f, 0, 0));
-                    }
-                    SDL_GetMouseState(&mousex, &mousey);
-                    break;
-
-                case SDL_MOUSEBUTTONDOWN:
-                    if(event.button.button == SDL_BUTTON_LEFT)
-                    {
-                        tryPlaceBrick();
-                    }
-                    if(event.button.button == SDL_BUTTON_RIGHT)
-                        rclick = true;
-
-                    if(event.button.button == 4)
-                        camera->addOffset(vec4(0,0,5,0));
-
-                    if(event.button.button == 5)
-                        camera->addOffset(vec4(0,0,-5,0));
-
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    if(event.button.button == SDL_BUTTON_RIGHT)
-                        rclick = false;
-                    break;
-            }
+        if(inputDevice->keyReleased(MOUSE_LEFT)) {
+            tryPlaceBrick();
         }
 
-        keystate = SDL_GetKeyState(0);
-        if(keystate[SDLK_a])
+        if(inputDevice->isKeyDown(MOUSE_RIGHT)) {
+            camera->addRotation(vec4( inputDevice->mouseDY() / 100.0f,
+                                     -inputDevice->mouseDX() / 100.0f, 0, 0));
+        }
+
+        if(inputDevice->isKeyDown(KEY_A))
         {
             camera->addPosition(vec4(-1,0,0,0));
         }
 
-        if(keystate[SDLK_d])
+        if(inputDevice->isKeyDown(KEY_D))
         {
             camera->addPosition(vec4(1,0,0,0));
         }
 
-        if(keystate[SDLK_w])
+        if(inputDevice->isKeyDown(KEY_W))
         {
             camera->addPosition(vec4(0,0,-1,0));
         }
 
-        if(keystate[SDLK_s])
+        if(inputDevice->isKeyDown(KEY_S))
         {
             camera->addPosition(vec4(0,0,1,0));
         }
 
-        if(keystate[SDLK_1])
+        if(inputDevice->isKeyDown(KEY_1))
         {
             delete cursor;
             cursor = new ANDBrick();
         }
 
-        if(keystate[SDLK_2])
+        if(inputDevice->isKeyDown(KEY_2))
         {
             delete cursor;
             cursor = new Wire8Brick();
         }
 
-        if(keystate[SDLK_3])
+        if(inputDevice->isKeyDown(KEY_3))
         {
             delete cursor;
             cursor = new LEDBrick();
         }
 
-        if(keystate[SDLK_3])
+        if(inputDevice->isKeyDown(KEY_4))
         {
             //cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
         }
 
-        static int left = 0;
-        static int right = 0;
-        if(keystate[SDLK_LEFT] && !left)
+        if(inputDevice->keyPressed(KEY_LEFT))
         {
             cursor->rotate(vec4(0,M_PI / 2.0f,0,0));
         }
 
-        if(keystate[SDLK_RIGHT] && !right)
+        if(inputDevice->keyPressed(KEY_RIGHT))
         {
-            cursor->rotate(vec4(0,M_PI / 2.0f,0,0));
+            cursor->rotate(vec4(0,-M_PI / 2.0f,0,0));
         }
-        left = keystate[SDLK_LEFT];
-        right = keystate[SDLK_RIGHT];
 
         cursor->position = cursor->position + ((target - cursor->position) * 0.25f);
         if(cursor->position.distanceSq(target) > 1000 * 1000)
@@ -276,7 +232,7 @@ ERR:
 #ifdef MOUSESUPPORT
         vec4 MOUSE;
         glReadBuffer(GL_COLOR_ATTACHMENT2);
-        glReadPixels(mousex, HEIGHT-mousey, 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
+        glReadPixels(inputDevice->mouseX(), HEIGHT-inputDevice->mouseY(), 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
         MOUSE.x = round(MOUSE.x / 8.0f) * 8.0f;
         MOUSE.y = ceil(MOUSE.y / 9.6f) * 9.6f;
         MOUSE.z = round(MOUSE.z / 8.0f) * 8.0f;
@@ -308,6 +264,7 @@ ERR:
 
     void update(float dt)
     {
+        Application::update(dt);
         for(int i = 0; i < bricks.size(); i++)
         {
             bricks[i]->update();
@@ -339,6 +296,7 @@ class QtApplication : public MainApplication {
 
     // called by GLFrame, hanging out with QtWindow
     void init() {
+        inputDevice = new QtInputDevice;
         MainApplication::init();
     }
 

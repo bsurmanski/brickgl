@@ -6,6 +6,7 @@ src/vector.cpp\
 src/box.cpp\
 src/framework/qtWindow.cpp\
 src/framework/window.cpp\
+src/framework/input/qtInputDevice.cpp\
 src/framework/input/sdlInputDevice.cpp\
 src/framework/input/inputDevice.cpp\
 src/framework/draw/camera.cpp\
@@ -32,6 +33,7 @@ src/box.hpp\
 src/framework/qtWindow.hpp\
 src/framework/window.hpp\
 src/framework/input/sdlInputDevice.hpp\
+src/framework/input/qtInputDevice.hpp\
 src/framework/input/inputDevice.hpp\
 src/framework/draw/camera.hpp\
 src/framework/draw/drawProgram.hpp\
@@ -51,7 +53,7 @@ src/brickMenu.hpp
 
 config += qt debug
 
-QMAKE_CXXFLAGS += -g
+QMAKE_CXXFLAGS += -g -Wno-unused-parameter
 
 QT = core gui opengl
 

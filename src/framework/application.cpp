@@ -1,6 +1,7 @@
 #include "application.hpp"
 
-Application::Application(Window *win, DrawDevice *ddev) : window(win), drawDevice(ddev)
+Application::Application(Window *win, DrawDevice *ddev, InputDevice *idev)
+: window(win), drawDevice(ddev), inputDevice(idev)
 {
 
 }
