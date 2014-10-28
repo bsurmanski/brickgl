@@ -28,6 +28,9 @@ class Window
     virtual void setWidth(uint32_t w);
     virtual void setHeight(uint32_t h);
     virtual void setName(std::string n);
+
+    virtual size_t frameHeight() = 0;
+    virtual size_t frameWidth() = 0;
 };
 
 #endif

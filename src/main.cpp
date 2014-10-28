@@ -37,9 +37,6 @@
 
 vec4 target;
 
-static unsigned WIDTH = 640;
-static unsigned HEIGHT = 480;
-
 class MainApplication : public Application
 {
     bool isRunning;
@@ -232,7 +229,7 @@ ERR:
 #ifdef MOUSESUPPORT
         vec4 MOUSE;
         glReadBuffer(GL_COLOR_ATTACHMENT2);
-        glReadPixels(inputDevice->mouseX(), HEIGHT-inputDevice->mouseY(), 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
+        glReadPixels(inputDevice->mouseX(), window->frameHeight()-inputDevice->mouseY(), 1, 1, GL_RGBA, GL_FLOAT, &MOUSE.v);
         MOUSE.x = round(MOUSE.x / 8.0f) * 8.0f;
         MOUSE.y = ceil(MOUSE.y / 9.6f) * 9.6f;
         MOUSE.z = round(MOUSE.z / 8.0f) * 8.0f;
@@ -301,7 +298,7 @@ class QtApplication : public MainApplication {
     }
 
     void run() {
-        window = new QtWindow(this, WIDTH, HEIGHT, "BrickSim");
+        window = new QtWindow(this, 640, 480, "BrickSim");
         app.exec();
     }
 };

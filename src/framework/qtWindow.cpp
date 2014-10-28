@@ -40,7 +40,8 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
     public:
     GLFrame(Application *_app, QWidget *parent) : QGLWidget(parent) {
         app = _app;
-        setMinimumSize(320, 240);
+        setMinimumSize(640, 480);
+        setMaximumSize(640, 480);
         setMouseTracking(true);
     }
 
@@ -126,12 +127,36 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
     : Window(app, w, h, name)
 {
     //setWindowTitle(name);
-    widget = new GLFrame(app, 0);
+    qwindow = new QMainWindow(0);
+    menubar = new QMenuBar(qwindow);
+    fileMenu = new QMenu("File", menubar);
+    saveAction = new QAction("Save", fileMenu);
+    loadAction = new QAction("Load", fileMenu);
+    quitAction = new QAction("Quit", fileMenu);
+    fileMenu->addAction(saveAction);
+    fileMenu->addAction(loadAction);
+    fileMenu->addAction(quitAction);
+    menubar->addMenu(fileMenu);
+    qwindow->setMenuBar(menubar);
+    //qwindow->resize(QSize(w, h));
+
+    widget = new GLFrame(app, qwindow);
     widget->resize(QSize(640, 480));
-    widget->show();
+    qwindow->setCentralWidget(widget);
+    qwindow->show();
+}
+
+size_t QtWindow::frameHeight() {
+    return widget->height();
+}
+size_t QtWindow::frameWidth() {
+    return widget->width();
 }
 
 QtWindow::~QtWindow() {
+    delete widget;
+    delete menubar;
+    delete qwindow;
 }
 
 void QtWindow::swapBuffers() {
