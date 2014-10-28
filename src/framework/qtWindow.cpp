@@ -133,6 +133,9 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
     saveAction = new QAction("Save", fileMenu);
     loadAction = new QAction("Load", fileMenu);
     quitAction = new QAction("Quit", fileMenu);
+    QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+    QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(load()));
+    QObject::connect(quitAction, SIGNAL(triggered()), this, SLOT(quit()));
     fileMenu->addAction(saveAction);
     fileMenu->addAction(loadAction);
     fileMenu->addAction(quitAction);
@@ -144,6 +147,26 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
     widget->resize(QSize(640, 480));
     qwindow->setCentralWidget(widget);
     qwindow->show();
+}
+
+void QtWindow::quit() {
+    app->quit();
+}
+
+void QtWindow::save() {
+    QString filenm = QFileDialog::getSaveFileName(qwindow, "Save File", "", "Brick Projects (*.bpj)");
+    int err = app->save(filenm.toUtf8().constData());
+    if(err) {
+        //TODO: error dialog
+    }
+}
+
+void QtWindow::load() {
+    QString filenm = QFileDialog::getOpenFileName(qwindow, "Load File", "", "Brick Projects (*.bpj)");
+    int err = app->load(filenm.toUtf8().constData());
+    if(err) {
+        //TODO: error dialog
+    }
 }
 
 size_t QtWindow::frameHeight() {

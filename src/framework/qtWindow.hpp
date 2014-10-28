@@ -8,10 +8,13 @@
 #include <qt/QtGui/QtGui>
 #include <qt/QtWidgets/QMainWindow>
 #include <qt/QtWidgets/QMenuBar>
+#include <qt/QtWidgets/QFileDialog>
 
 class GLFrame;
 
-class QtWindow : public Window {
+class QtWindow : public QObject, public Window {
+    Q_OBJECT
+
     QMainWindow *qwindow;
 
     QMenuBar *menubar;
@@ -22,6 +25,10 @@ class QtWindow : public Window {
 
     GLFrame *widget;
 
+    protected slots:
+    void quit();
+    void save();
+    void load();
     public:
     QtWindow(Application *app, uint32_t w, uint32_t h, std::string name);
     virtual size_t frameHeight();

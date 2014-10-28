@@ -26,3 +26,5 @@ callgrind.out.*
 
 build
 Makefile
+
+moc_*

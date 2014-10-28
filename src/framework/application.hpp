@@ -28,6 +28,10 @@ class Application
         if(inputDevice) inputDevice->update(dt);
     }
     virtual void run() {}
+
+    virtual void quit() {}
+    virtual int save(std::string filenm) { return 0; }
+    virtual int load(std::string filenm) { return 0; }
 };
 
 #endif

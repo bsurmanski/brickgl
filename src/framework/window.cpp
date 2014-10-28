@@ -2,8 +2,9 @@
 
 #include "application.hpp"
 
-Window::Window(Application *app, uint32_t w, uint32_t h, std::string name)
+Window::Window(Application *_app, uint32_t w, uint32_t h, std::string name)
 {
+    this->app = _app;
     this->width = w;
     this->height = h;
     this->name = name;
