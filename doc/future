@@ -1,0 +1,3 @@
+connect simulator to ucontroller brick
+IDE in simulator (use Qt text field + syntax highlighting)
+network communication for cooperative building

@@ -1,5 +1,6 @@
 SOURCES = \
 src/main.cpp\
+src/mainApplication.cpp\
 src/brick.cpp\
 src/matrix.cpp\
 src/vector.cpp\
@@ -23,9 +24,11 @@ src/framework/draw/objFormat.cpp\
 src/framework/draw/pngFormat.cpp\
 src/framework/draw/mesh.cpp\
 src/framework/application.cpp\
-src/brickMenu.cpp
+src/brickMenu.cpp\
+src/io/palmIOManager.cpp
 
 HEADERS = \
+src/mainApplication.hpp\
 src/brick.hpp\
 src/matrix.hpp\
 src/vector.hpp\
@@ -49,7 +52,9 @@ src/framework/draw/objFormat.hpp\
 src/framework/draw/pngFormat.hpp\
 src/framework/draw/mesh.hpp\
 src/framework/application.hpp\
-src/brickMenu.hpp
+src/brickMenu.hpp\
+src/io/brickIOManager.hpp\
+src/io/palmIOManager.hpp
 
 config += qt debug
 
