@@ -1,6 +1,6 @@
 #include "mainApplication.hpp"
 
-#include "framework/draw/objFormat.hpp"
+#include "io/palmIOManager.hpp"
 #include "matrix.hpp"
 
 MainApplication::MainApplication(int argc, char **argv) {
@@ -226,4 +226,14 @@ void MainApplication::run() {
         update(32);
         draw();
     }
+}
+
+int MainApplication::save(std::string filenm) {
+    PalmIOManager pio;
+    pio.save(this, filenm);
+}
+
+int MainApplication::load(std::string filenm) {
+    PalmIOManager pio;
+    pio.load(this, filenm);
 }

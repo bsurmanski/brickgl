@@ -36,6 +36,9 @@ class MainApplication : public Application {
     virtual void update(float dt);
     virtual void run();
 
+    virtual int save(std::string filenm);
+    virtual int load(std::string filenm);
+
     Camera *getCamera() { return camera; }
     std::vector<Brick*>* getBricks() { return &bricks; }
 };

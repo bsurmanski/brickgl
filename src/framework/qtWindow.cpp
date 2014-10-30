@@ -154,7 +154,8 @@ void QtWindow::quit() {
 }
 
 void QtWindow::save() {
-    QString filenm = QFileDialog::getSaveFileName(qwindow, "Save File", "", "Brick Projects (*.bpj)");
+    QString filter = "Brick Project (*.bpj)";
+    QString filenm = QFileDialog::getSaveFileName(qwindow, "Save File", "", "Brick Projects (*.bpj)", &filter);
     int err = app->save(filenm.toUtf8().constData());
     if(err) {
         //TODO: error dialog

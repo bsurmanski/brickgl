@@ -58,7 +58,10 @@ src/io/palmIOManager.hpp
 
 config += qt debug
 
-QMAKE_CXXFLAGS += -g -Wno-unused-parameter
+QMAKE_CXXFLAGS += -g -O0 -Wno-unused-parameter
+QMAKE_LFLAGS += -O0
+
+QMAKE_CXXFLAGS -= -O1
 
 QT = core gui opengl
 
