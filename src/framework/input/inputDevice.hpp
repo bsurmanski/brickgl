@@ -71,6 +71,10 @@ class InputDevice : public Device
     virtual unsigned mouseY() = 0;
     virtual int mouseDX() = 0;
     virtual int mouseDY() = 0;
+
+    virtual int wheelDX() = 0;
+    virtual int wheelDY() = 0;
+
     virtual void update(float dt) {}
 };
 

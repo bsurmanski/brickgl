@@ -34,9 +34,21 @@ int QtInputDevice::mouseDY() {
     return mousey - omousey;
 }
 
+int QtInputDevice::wheelDX() {
+    return wheelx;
+}
+
+int QtInputDevice::wheelDY() {
+    return wheely;
+}
+
 
 void QtInputDevice::update(float dt) {
     omousex = mousex;
     omousey = mousey;
+    owheelx = wheelx;
+    owheely = wheely;
+    wheelx = 0;
+    wheely = 0;
     memcpy(okeystate, keystate, sizeof(uint8_t) * NKEYS);
 }

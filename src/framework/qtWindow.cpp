@@ -76,9 +76,26 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
         app->update(32);
     }
 
+    void wheelEvent(QWheelEvent *event) {
+        QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
+        if(!qidevice) {
+            QWidget::wheelEvent(event);
+            return;
+        }
+
+        if(event->orientation() == Qt::Horizontal) {
+            qidevice->setWheelDX(event->delta());
+        } else {
+            qidevice->setWheelDY(event->delta());
+        }
+    }
+
     void mouseMoveEvent(QMouseEvent *event) {
         QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
-        if(!qidevice) return;
+        if(!qidevice) {
+            QWidget::mouseMoveEvent(event);
+            return;
+        }
 
         qidevice->setMouseX(event->x());
         qidevice->setMouseY(event->y());
@@ -86,27 +103,42 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
 
     void mousePressEvent(QMouseEvent *event) {
         QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
-        if(!qidevice) return;
+        if(!qidevice) {
+            QWidget::mousePressEvent(event);
+            return;
+        }
 
         unsigned key = qtToInputMouse(event->button());
-        if(key == KEY_UNKNOWN) return;
+        if(key == KEY_UNKNOWN) {
+            QWidget::mousePressEvent(event);
+            return;
+        }
 
         qidevice->setKey(key, 1);
     }
 
     void mouseReleaseEvent(QMouseEvent *event) {
         QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
-        if(!qidevice) return;
+        if(!qidevice) {
+            QWidget::mouseReleaseEvent(event);
+            return;
+        }
 
         unsigned key = qtToInputMouse(event->button());
-        if(key == KEY_UNKNOWN) return;
+        if(key == KEY_UNKNOWN) {
+            QWidget::mouseReleaseEvent(event);
+            return;
+        }
 
         qidevice->setKey(key, 0);
     }
 
     void keyPressEvent(QKeyEvent *event) {
         QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
-        if(!qidevice) return;
+        if(!qidevice) {
+            QWidget::keyPressEvent(event);
+            return;
+        }
 
         unsigned key = qtToInputKey(event->key());
         if(key == KEY_UNKNOWN) {
@@ -119,7 +151,10 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
 
     void keyReleaseEvent(QKeyEvent *event) {
         QtInputDevice *qidevice = dynamic_cast<QtInputDevice*>(app->getInputDevice());
-        if(!qidevice) return;
+        if(!qidevice) {
+            QWidget::keyReleaseEvent(event);
+            return;
+        }
 
         unsigned key = qtToInputKey(event->key());
         if(key == KEY_UNKNOWN) {

@@ -62,9 +62,10 @@ for(int j = i; j >= 0; j--) {
 }
 
 void MainApplication::input() {
-    //TODO: scroll zoom in/out
-    //camera->addOffset(vec4(0,0,5,0));
-    //camera->addOffset(vec4(0,0,-5,0));
+    // scroll zoom in/out
+    if(inputDevice->wheelDY() != 0) {
+        camera->addOffset(vec4(0,0, inputDevice->wheelDY() / 20.0f,0));
+    }
 
     if(inputDevice->keyReleased(MOUSE_LEFT)) {
         tryPlaceBrick();
@@ -75,6 +76,8 @@ void MainApplication::input() {
                                  -inputDevice->mouseDX() / 100.0f, 0, 0));
     }
 
+
+    //TODO: move camera based on view orientation
     if(inputDevice->isKeyDown(KEY_A))
     {
         camera->addPosition(vec4(-1,0,0,0));
