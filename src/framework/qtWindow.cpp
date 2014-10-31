@@ -6,6 +6,7 @@
 #include "input/qtInputDevice.hpp"
 
 static unsigned qtToInputKey(unsigned key) {
+        printf("%c\n", key);
         switch(key) {
             case Qt::Key_Escape: return KEY_ESC;
             case Qt::Key_Space: return KEY_SPACE;
@@ -43,6 +44,7 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
         setMinimumSize(640, 480);
         setMaximumSize(640, 480);
         setMouseTracking(true);
+        setFocusPolicy(Qt::StrongFocus);
     }
 
     virtual ~GLFrame() {
@@ -107,7 +109,10 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
         if(!qidevice) return;
 
         unsigned key = qtToInputKey(event->key());
-        if(key == KEY_UNKNOWN) return;
+        if(key == KEY_UNKNOWN) {
+            QWidget::keyPressEvent(event);
+            return;
+        }
 
         qidevice->setKey(key, 1);
     }
@@ -117,7 +122,10 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
         if(!qidevice) return;
 
         unsigned key = qtToInputKey(event->key());
-        if(key == KEY_UNKNOWN) return;
+        if(key == KEY_UNKNOWN) {
+            QWidget::keyReleaseEvent(event);
+            return;
+        }
 
         qidevice->setKey(key, 0);
     }
