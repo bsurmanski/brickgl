@@ -184,6 +184,7 @@ class Brick
     void disconnect(Brick *o);
     virtual Brick *copy() = 0;
     virtual PegInfo *getPegInfo(int x, int y)=0;
+    virtual std::string typeName()=0;
 
     PegInfo *getPegInfo(int n) {
         return getPegInfo(n % width(), n / width());
@@ -300,6 +301,8 @@ class ORBrick : public TwoInputBrick {
         pegOut->setValue(pegIn0->isActive() || pegIn1->isActive());
     }
 
+    virtual std::string typeName() { return "or"; }
+
 };
 
 class ANDBrick : public TwoInputBrick {
@@ -317,6 +320,8 @@ class ANDBrick : public TwoInputBrick {
         pegIn1->update();
         pegOut->setValue(pegIn0->isActive() && pegIn1->isActive());
     }
+
+    virtual std::string typeName() { return "and"; }
 };
 
 class Wire8Brick : public Brick {
@@ -351,6 +356,8 @@ class Wire8Brick : public Brick {
     virtual void flip() {
         //TODO: set value of pegs
     }
+
+    virtual std::string typeName() { return "wire"; }
 };
 
 class LEDBrick : public Brick {
@@ -395,6 +402,7 @@ class LEDBrick : public Brick {
         pegGnd->flip();
     }
 
+    virtual std::string typeName() { return "led"; }
 };
 
 #endif

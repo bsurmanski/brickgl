@@ -135,6 +135,7 @@ class PalmIOManager : BrickIOManager {
     void inputTopLevel(PalmListElement *list, MainApplication *app);
 
     void outputCamera(std::ofstream &file, Camera *cam);
+    void outputBrick(std::ofstream &file, Brick *brick);
     void outputBricks(std::ofstream &file, MainApplication *app);
     void outputVec4(std::ofstream &file, std::string label, vec4 pos);
     void indentLevel(std::ofstream &file);

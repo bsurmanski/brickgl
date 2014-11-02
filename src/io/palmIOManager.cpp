@@ -292,8 +292,24 @@ void PalmIOManager::outputCamera(std::ofstream &file, Camera *cam) {
 }
 
 
-void PalmIOManager::outputBricks(std::ofstream &file, MainApplication *app) {
+void PalmIOManager::outputBrick(std::ofstream &file, Brick *brick) {
+    level++;
+    indentLevel(file);
+    file << "(brick ";
+    file << "(type " << brick->typeName() << ") ";
+    outputVec4(file, "position", brick->position);
+    file << " ";
+    outputVec4(file, "rotation", brick->rotation);
+    file << ")\n";
+    level--;
 
+}
+
+void PalmIOManager::outputBricks(std::ofstream &file, MainApplication *app) {
+    std::vector<Brick*>* bricks = app->getBricks();
+    for(int i = 0; i < bricks->size(); i++) {
+        outputBrick(file, bricks->at(i));
+    }
 }
 
 void PalmIOManager::outputVec4(std::ofstream &file, std::string label, vec4 pos) {
