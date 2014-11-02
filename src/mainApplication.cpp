@@ -23,9 +23,7 @@ void MainApplication::init() {
     Brick::init();
 }
 
-bool MainApplication::tryPlaceBrick() {
-    Brick *b = cursor;
-    b->position = target;
+bool MainApplication::tryPlaceBrick(Brick *b) {
     bool collision = false;
     int i;
     for(i = 0; i < bricks.size(); i++)
@@ -48,7 +46,6 @@ bool MainApplication::tryPlaceBrick() {
     if(!collision)
     {
         bricks.push_back(b);
-        cursor = cursor->copy();
         return true;
     }
 
@@ -68,7 +65,10 @@ void MainApplication::input() {
     }
 
     if(inputDevice->keyReleased(MOUSE_LEFT)) {
-        tryPlaceBrick();
+        cursor->position = target;
+        if(tryPlaceBrick(cursor)) {
+            cursor = cursor->copy();
+        }
     }
 
     if(inputDevice->isKeyDown(MOUSE_RIGHT)) {

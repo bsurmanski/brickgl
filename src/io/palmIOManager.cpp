@@ -235,6 +235,61 @@ void PalmIOManager::inputCamera(PalmListElement *list, Camera *cam) {
     }
 }
 
+void PalmIOManager::inputBrick(PalmListElement *list, MainApplication *app) {
+    std::string type = "";
+    vec4 pos;
+    vec4 rot;
+
+    PalmElement *it = list->getFirst();
+    if(it->asString() && it->asString()->getValue() != "brick") {
+        // ERROR invalid list passed
+    }
+
+
+    it = it->getNext(); //skip name
+
+    while(it) {
+        if(it && it->asList()) {
+            PalmListElement *itl = it->asList();
+            if(itl->getName() == "type") {
+                 PalmStringElement *etype = elementAsString(itl->getElement(1));
+                 if(!etype) {
+                     //ERROR
+                     continue;
+                 }
+                 type = etype->getValue();
+            } else if(itl->getName() == "position") {
+                pos = inputVector(itl);
+            } else if(itl->getName() == "rotation") {
+                rot = inputVector(itl);
+            }
+        }
+
+        it = it->getNext();
+    }
+
+    Brick *b = NULL;
+    if(type == "and") {
+        b = new ANDBrick(pos, rot);
+    } else if (type == "or") {
+        b = new ORBrick(pos, rot);
+    } else if (type == "led") {
+        b = new LEDBrick(pos, rot);
+    } else if (type == "wire") {
+        b = new Wire8Brick(pos, rot);
+    }
+
+    if(!b) {
+        // ERROR
+        return;
+    }
+
+    if(!app->tryPlaceBrick(b)) {
+        printf("invalid brick in attempt to load");
+        // ERROR
+    }
+}
+
 void PalmIOManager::inputTopLevel(PalmListElement *list, MainApplication *app) {
     PalmElement *it = list->getFirst();
     if(!it->isString() || it->asString()->getValue() != "brickgl") {
@@ -250,6 +305,8 @@ void PalmIOManager::inputTopLevel(PalmListElement *list, MainApplication *app) {
             printf("itl: %s\n", itl->getName().c_str());
             if(itl->getName() == "camera") {
                 inputCamera(itl, app->getCamera());
+            } else if(itl->getName() == "brick") {
+                inputBrick(itl, app);
             }
         }
 

@@ -103,6 +103,15 @@ class PalmListElement : public PalmElement {
 
     PalmListElement(PalmElement *f=NULL) : first(f) {}
     PalmElement *getFirst() { return first; }
+    PalmElement *getElement(unsigned i) {
+        PalmElement *e = first;
+
+        while(e && i) {
+            e = e->getNext();
+            i--;
+        }
+        return e;
+    }
     virtual PalmListElement *asList() { return this; }
     std::string getName(); // actually string in first element (if exists)
 };
@@ -127,10 +136,16 @@ class PalmIOManager : BrickIOManager {
     int level;
     PalmLexer *lexer;
 
+    PalmStringElement *elementAsString(PalmElement *p) {
+        if(p) return p->asString();
+        return NULL;
+    }
+
     protected:
 
     PalmElement *parseElement(PalmLexer *lex);
     vec4 inputVector(PalmListElement *list);
+    void inputBrick(PalmListElement *list, MainApplication *app);
     void inputCamera(PalmListElement *list, Camera *cam);
     void inputTopLevel(PalmListElement *list, MainApplication *app);
 

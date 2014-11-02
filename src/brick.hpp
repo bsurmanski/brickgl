@@ -150,6 +150,7 @@ class Brick
 
     enum Type
     {
+        BRICK_UNKNOWN,
         BRICK_OR,
         BRICK_AND,
         BRICK_LED,

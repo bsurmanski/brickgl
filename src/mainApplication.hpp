@@ -19,7 +19,6 @@ class MainApplication : public Application {
     BrickMenu *brickMenu;
 
     protected:
-    bool tryPlaceBrick();
     void drawBrick(GLMesh *mesh, GLTexture *tex, vec4 pos, unsigned w, unsigned h);
     Brick *findClosestBrick(vec4 p);
 
@@ -38,6 +37,8 @@ class MainApplication : public Application {
 
     virtual int save(std::string filenm);
     virtual int load(std::string filenm);
+
+    bool tryPlaceBrick(Brick *b);
 
     Camera *getCamera() { return camera; }
     std::vector<Brick*>* getBricks() { return &bricks; }
