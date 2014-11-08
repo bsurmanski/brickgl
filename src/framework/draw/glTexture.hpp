@@ -29,6 +29,8 @@ class GLTexture
     //GLTexture(Image &i);
     GLTexture(Image i);
 
+    Image asImage();
+
     friend class GLDrawProgram;
     friend class GLDrawDevice;
     friend class GLFramebuffer;

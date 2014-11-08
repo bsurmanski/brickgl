@@ -6,7 +6,6 @@
 #include "input/qtInputDevice.hpp"
 
 static unsigned qtToInputKey(unsigned key) {
-        printf("%c\n", key);
         switch(key) {
             case Qt::Key_Escape: return KEY_ESC;
             case Qt::Key_Space: return KEY_SPACE;
@@ -166,7 +165,7 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
     }
 };
 
-QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
+QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name, bool show)
     : Window(app, w, h, name)
 {
     //setWindowTitle(name);
@@ -189,6 +188,8 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name)
     widget = new GLFrame(app, qwindow);
     widget->resize(QSize(640, 480));
     qwindow->setCentralWidget(widget);
+
+    if(show) qwindow->show();
     qwindow->show();
 }
 

@@ -23,17 +23,6 @@ GLTexture *Brick::outputTexture;
 GLTexture *Brick::input1Texture;
 GLTexture *Brick::input2Texture;
 
-/*
-bool Brick::Peg::collides(Brick *b)
-{
-
-}
-
-bool Brick::Peg::connects(Peg *p)
-{
-
-}*/
-
 box Brick::getBox()
 {
     // offset by half a lego unit to align to pegs

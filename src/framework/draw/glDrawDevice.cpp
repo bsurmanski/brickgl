@@ -81,6 +81,7 @@ GLDrawDevice::GLDrawDevice()
     lightBuffer = new GLFramebuffer;
     lightBuffer->appendTarget(lightTexture);
 
+
     mainProgram->use();
 }
 
@@ -211,6 +212,7 @@ void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)
     mainProgram->setUniform("ambient", vec4(0.1, 0.1, 0.1, 0));
 
     mainProgram->bindTexture("t_color", 0, tex);
+
     mainProgram->drawMesh(mesh);
 }
 
@@ -259,4 +261,25 @@ void GLDrawDevice::drawFlat(GLTexture *tex, vec4 loc, vec4 scale)
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+}
+
+Image GLDrawDevice::screenshot() {
+    Image i;
+    i.w = width;
+    i.h = height;
+    i.pixels = (uint8_t*) malloc(width * height * 4); //TODO: free
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, i.pixels);
+
+    // do some stupid dance to swap R and B components of color
+    // because OpenGL outputs ABGR or something silly
+    uint32_t *pxl = (uint32_t*) i.pixels;
+    for(int i = 0; i < width * height; i++) {
+        int R = pxl[i] & 0x00ff0000;
+        int B = pxl[i] & 0x000000ff;
+        pxl[i] = (pxl[i] & 0xff00ff00) | (R >> 16) | (B << 16);
+    }
+
+    return i;
 }

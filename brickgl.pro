@@ -22,6 +22,7 @@ src/framework/draw/glDrawShader.cpp\
 src/framework/draw/glDrawProgram.cpp\
 src/framework/draw/objFormat.cpp\
 src/framework/draw/pngFormat.cpp\
+src/framework/draw/tgaFormat.cpp\
 src/framework/draw/mesh.cpp\
 src/framework/application.cpp\
 src/brickMenu.cpp\
@@ -50,6 +51,7 @@ src/framework/draw/glDrawShader.hpp\
 src/framework/draw/glDrawProgram.hpp\
 src/framework/draw/objFormat.hpp\
 src/framework/draw/pngFormat.hpp\
+src/framework/draw/tgaFormat.hpp\
 src/framework/draw/mesh.hpp\
 src/framework/application.hpp\
 src/brickMenu.hpp\

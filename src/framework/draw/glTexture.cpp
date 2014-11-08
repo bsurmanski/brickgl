@@ -101,3 +101,13 @@ GLTexture::GLTexture(Image i) : w(i.w), h(i.h)
             getGLType(i.format), i.pixels);
     //TODO: getGLFormat expects GLTexture::Format, not Image::Format
 }
+
+Image GLTexture::asImage() {
+    Image i;
+    i.w = w;
+    i.h = h;
+    i.pixels = (uint8_t*) malloc(w * h * 4); //XXX free
+    glBindTexture(GL_TEXTURE_2D, id);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, i.pixels);
+    return i;
+}

@@ -1,6 +1,7 @@
 #include "mainApplication.hpp"
 
 #include "io/palmIOManager.hpp"
+#include "framework/draw/tgaFormat.hpp"
 #include "matrix.hpp"
 
 MainApplication::MainApplication(int argc, char **argv) {
@@ -131,6 +132,7 @@ void MainApplication::input() {
         cursor->rotate(vec4(0,-M_PI / 2.0f,0,0));
     }
 
+
     cursor->position = cursor->position + ((target - cursor->position) * 0.25f);
     if(cursor->position.distanceSq(target) > 1000 * 1000)
     {
@@ -189,8 +191,7 @@ void MainApplication::draw() {
     Brick *br = findClosestBrick(MOUSE);
 
 #endif
-    //target.print();
-    //printf("\n");
+
     cursor->draw(drawDevice);
 
     ((GLDrawDevice*)drawDevice)->applyLighting();
@@ -204,7 +205,13 @@ void MainApplication::draw() {
     ((GLDrawDevice*)drawDevice)->drawToScreen();
 
     brickMenu->draw(drawDevice);
-    drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
+    //drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
+
+    // this is here so that everything can be drawn before a screenshot
+    if(inputDevice->isKeyDown(KEY_P)) {
+        printf("Screenshot\n");
+        screenshot("screenshot.tga");
+    }
 
     window->swapBuffers();
 }
@@ -239,4 +246,10 @@ int MainApplication::save(std::string filenm) {
 int MainApplication::load(std::string filenm) {
     PalmIOManager pio;
     pio.load(this, filenm);
+}
+
+void MainApplication::screenshot(std::string filenm) {
+        draw();
+        Image img = ((GLDrawDevice*)drawDevice)->screenshot();
+        outputTGA(filenm, img);
 }

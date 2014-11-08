@@ -33,6 +33,7 @@ class QtApplication : public MainApplication {
 
     public:
     QtApplication(int argc, char **argv) : MainApplication(argc, argv), app(argc, argv) {
+        screenie = false;
     }
 
     // called by GLFrame, hanging out with QtWindow
@@ -45,11 +46,21 @@ class QtApplication : public MainApplication {
         window = new QtWindow(this, 640, 480, "BrickSim");
         app.exec();
     }
+
+    /*
+    void screenshotAndExit(std::string brickfile, std::string ifile) {
+        screenie = true;
+        window = new QtWindow(this, 640, 480, "BrickSim", false);
+        brkfile = brickfile;
+        imgfile = ifile;
+        app.exec();
+    } */
 };
 
 int main(int argc, char **argv)
 {
     QtApplication app(argc, argv);
     app.run();
+    //app.screenshotAndExit("out.bpj", "output.tga");
     return 0;
 }

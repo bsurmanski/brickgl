@@ -30,7 +30,7 @@ class QtWindow : public QObject, public Window {
     void save();
     void load();
     public:
-    QtWindow(Application *app, uint32_t w, uint32_t h, std::string name);
+    QtWindow(Application *app, uint32_t w, uint32_t h, std::string name, bool show=true);
     virtual size_t frameHeight();
     virtual size_t frameWidth();
     virtual ~QtWindow();
