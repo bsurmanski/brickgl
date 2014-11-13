@@ -13,6 +13,8 @@
 class MainApplication : public Application {
     protected:
     bool isRunning;
+    bool willScreenshot;
+
     vec4 target;
     std::vector<Brick*> bricks;
     Camera *camera;

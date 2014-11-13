@@ -11,6 +11,7 @@ MainApplication::MainApplication(int argc, char **argv) {
     isRunning = false;
     camera = NULL;
     brickMenu = NULL;
+    willScreenshot = false;
 }
 
 void MainApplication::init() {
@@ -97,6 +98,10 @@ void MainApplication::input() {
     if(inputDevice->isKeyDown(KEY_S))
     {
         camera->addPosition(vec4(0,0,1,0));
+    }
+
+    if(inputDevice->keyPressed(KEY_P)) {
+        willScreenshot = true;
     }
 
     if(inputDevice->isKeyDown(KEY_1))
@@ -208,8 +213,9 @@ void MainApplication::draw() {
     //drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
 
     // this is here so that everything can be drawn before a screenshot
-    if(inputDevice->isKeyDown(KEY_P)) {
-        printf("Screenshot\n");
+    if(willScreenshot) {
+        willScreenshot = false;
+        //printf("Screenshot\n");
         screenshot("screenshot.tga");
     }
 
@@ -230,8 +236,7 @@ void MainApplication::update(float dt) {
 }
 
 void MainApplication::run() {
-    while(isRunning)
-    {
+    while(isRunning) {
         input();
         update(32);
         draw();
@@ -249,7 +254,8 @@ int MainApplication::load(std::string filenm) {
 }
 
 void MainApplication::screenshot(std::string filenm) {
-        draw();
-        Image img = ((GLDrawDevice*)drawDevice)->screenshot();
-        outputTGA(filenm, img);
+    printf("saving screenshot to %s\n", filenm.c_str());
+    draw();
+    Image img = ((GLDrawDevice*)drawDevice)->screenshot();
+    outputTGA(filenm, img);
 }

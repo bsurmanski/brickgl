@@ -78,10 +78,12 @@ bool box::collides3(box &o)
            overlaps(position.y, dimension.y, o.position.y, o.dimension.y) &&
            overlaps(position.z, dimension.z, o.position.z, o.dimension.z);
 
+    /*
     printf("%d %d %d\n",
            overlaps(position.x, dimension.x, o.position.x, o.dimension.x),
            overlaps(position.y, dimension.y, o.position.y, o.dimension.y),
            overlaps(position.z, dimension.z, o.position.z, o.dimension.z));
+    */
 
     return ret;
 }

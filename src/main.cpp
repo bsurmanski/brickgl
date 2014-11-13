@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <math.h>
+#include <unistd.h>
 #include <SDL/SDL.h>
 
 #define GL_GLEXT_PROTOTYPES
@@ -33,7 +34,7 @@ class QtApplication : public MainApplication {
 
     public:
     QtApplication(int argc, char **argv) : MainApplication(argc, argv), app(argc, argv) {
-        screenie = false;
+
     }
 
     // called by GLFrame, hanging out with QtWindow
@@ -47,20 +48,46 @@ class QtApplication : public MainApplication {
         app.exec();
     }
 
-    /*
-    void screenshotAndExit(std::string brickfile, std::string ifile) {
-        screenie = true;
+    void quickScreenshot() {
         window = new QtWindow(this, 640, 480, "BrickSim", false);
-        brkfile = brickfile;
-        imgfile = ifile;
+
+        willScreenshot = true;
+        isRunning = false;
+        load("out.bpj");
+
         app.exec();
-    } */
+    }
+
+    void update(float dt) {
+        MainApplication::update(dt);
+
+        if(!isRunning && !willScreenshot) {
+            app.exit();
+        }
+    }
 };
 
 int main(int argc, char **argv)
 {
     QtApplication app(argc, argv);
-    app.run();
-    //app.screenshotAndExit("out.bpj", "output.tga");
+
+    bool screenshot = false;
+
+    int c;
+    while(optind < argc) {
+        c = getopt(argc, argv, "s");
+        switch(c) {
+            case 's':
+                screenshot = true;
+                break;
+        }
+    }
+
+    if(screenshot) {
+        app.quickScreenshot();
+    } else {
+        app.run();
+    }
+
     return 0;
 }

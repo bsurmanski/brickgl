@@ -49,6 +49,10 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
     virtual ~GLFrame() {
     }
 
+    virtual void glInit() {
+        QGLWidget::glInit();
+    }
+
     QSize sizeHint() {
         return QSize(640, 480);
     }
@@ -73,6 +77,10 @@ class GLFrame : public QGLWidget, protected QGLFunctions {
         update();
         app->input();
         app->update(32);
+
+        if(true) {
+            paintGL();
+        }
     }
 
     void wheelEvent(QWheelEvent *event) {
@@ -186,11 +194,11 @@ QtWindow::QtWindow(Application *app, uint32_t w, uint32_t h, std::string name, b
     //qwindow->resize(QSize(w, h));
 
     widget = new GLFrame(app, qwindow);
-    widget->resize(QSize(640, 480));
+    widget->glInit();
+    widget->resizeGL(640, 480);
     qwindow->setCentralWidget(widget);
 
-    if(show) qwindow->show();
-    qwindow->show();
+    /*if(show)*/ qwindow->show();
 }
 
 void QtWindow::quit() {
@@ -228,7 +236,9 @@ QtWindow::~QtWindow() {
 }
 
 void QtWindow::swapBuffers() {
-    widget->swapBuffers();
+    //if(widget->isExposed()) {
+        //widget->swapBuffers();
+    //}
 }
 
 void QtWindow::clear() {

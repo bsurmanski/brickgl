@@ -30,3 +30,5 @@ Makefile
 moc_*
 
 *.bpj
+
+screenshot.tga
