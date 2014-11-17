@@ -13,6 +13,7 @@ src/framework/input/inputDevice.cpp\
 src/framework/draw/camera.cpp\
 src/framework/draw/drawProgram.cpp\
 src/framework/draw/drawDevice.cpp\
+src/framework/draw/glCubemap.cpp\
 src/framework/draw/glTexture.cpp\
 src/framework/draw/glFramebuffer.cpp\
 src/framework/draw/image.cpp\
@@ -42,6 +43,7 @@ src/framework/input/inputDevice.hpp\
 src/framework/draw/camera.hpp\
 src/framework/draw/drawProgram.hpp\
 src/framework/draw/drawDevice.hpp\
+src/framework/draw/glCubemap.hpp\
 src/framework/draw/glTexture.hpp\
 src/framework/draw/glFramebuffer.hpp\
 src/framework/draw/image.hpp\

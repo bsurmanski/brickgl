@@ -6,6 +6,7 @@
 
 // builtin fullscreen quad, and deferred shaders
 
+// position, normal, uv
 static float quadv[] = {
     -1, -1, 1,  0, 0, -1,  0, 0,
     1, -1, 1,   0, 0, -1,  1, 0,
@@ -60,13 +61,17 @@ GLDrawDevice::GLDrawDevice()
     height = 480;
     mainProgram = GLDrawProgram::fromVFShaderStrings(mainvs, mainfs);
 
-    GLTexture *lightTexture = new GLTexture(width, height, GLTexture::RGBA8);
+    GLTexture *colorTexture = new GLTexture(width, height, GLDraw::RGBA8);
+    GLTexture *normalTexture = new GLTexture(width, height, GLDraw::RGBA8I);
+    GLTexture *positionTexture = new GLTexture(width, height, GLDraw::RGBA32F);
+    GLTexture *lightTexture = new GLTexture(width, height, GLDraw::RGBA8);
     mainBuffer = new GLFramebuffer;
-    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8)); //color
-    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA8I)); //normal
-    mainBuffer->appendTarget(new GLTexture(width, height, GLTexture::RGBA32F)); //position
+    mainBuffer->appendTarget(colorTexture); //color
+    mainBuffer->appendTarget(normalTexture); //normal
+    mainBuffer->appendTarget(positionTexture); //position
     mainBuffer->appendTarget(lightTexture);
-    mainBuffer->setDepth(new GLTexture(width, height, GLTexture::DEPTH32)); // depth
+    mainBuffer->setDepth(new GLTexture(width, height, GLDraw::DEPTH32)); // depth
+
 
     const char lightvs[] = {
         #include "../../glsl/light.vs.h"
@@ -81,6 +86,15 @@ GLDrawDevice::GLDrawDevice()
     lightBuffer = new GLFramebuffer;
     lightBuffer->appendTarget(lightTexture);
 
+    const char skyboxvs[] = {
+        #include "../../glsl/skybox.vs.h"
+    };
+
+    const char skyboxfs[] = {
+        #include "../../glsl/skybox.fs.h"
+    };
+
+    skyboxProgram = GLDrawProgram::fromVFShaderStrings(skyboxvs, skyboxfs);
 
     mainProgram->use();
 }
@@ -196,6 +210,45 @@ void GLDrawDevice::drawLight(vec4 loc, vec4 color, float brightness)
     lightProgram->bindTexture("t_position", 1, mainBuffer->getTarget(2));
     lightProgram->bindTexture("t_depth", 2, mainBuffer->getDepth());
     this->drawFullscreenQuad();
+}
+
+
+#include "objFormat.hpp"
+void GLDrawDevice::drawSkybox(GLCubemap *tex) {
+    GLMesh *mesh = GLMesh::getUnitCube();
+
+    static GLMesh *glMesh = NULL;
+    if(!glMesh) {
+        Mesh nmesh = objLoad("res/1x1.obj");
+        glMesh = new GLMesh(nmesh);
+    }
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_SCISSOR_TEST);
+
+    mat4 vMatrix = mat4::getRotation(camera.getRotation());
+
+    mat4 mMatrix = mat4::getIdentity();
+    mat4 mvpMatrix = camera.getPerspective() * vMatrix;
+
+    skyboxProgram->use();
+    mainBuffer->bind();
+
+    //skyboxProgram->setUniform("mvpMatrix", mvpMatrix);
+    skyboxProgram->setUniform("mvpMatrix", mvpMatrix);
+    skyboxProgram->setUniform("mMatrix", mMatrix);
+    skyboxProgram->setUniform("ambient", vec4(1.0, 1.0, 1.0, 1.0));
+
+    skyboxProgram->bindTexture("t_color", 0, tex);
+
+    skyboxProgram->drawMesh(mesh);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
 }
 
 void GLDrawDevice::drawMesh(GLMesh *mesh, GLTexture *tex, mat4 mMatrix)

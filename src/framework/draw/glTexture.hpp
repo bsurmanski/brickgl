@@ -4,12 +4,11 @@
 #include <GL/gl.h>
 #include "image.hpp"
 
-class GLTexture
-{
-    GLuint id;
-    unsigned w, h;
+namespace GLDraw {
+    int getGLFormat(int format);
+    int getGLInternalFormat(int format);
+    int getGLType(int format);
 
-    public:
     enum Format
     {
         RGB8,
@@ -21,6 +20,14 @@ class GLTexture
         DEPTH32,
         DEPTH24_STENCIL8,
     };
+}
+
+class GLTexture
+{
+    GLuint id;
+    unsigned w, h;
+
+    public:
 
     unsigned getWidth() { return w; }
     unsigned getHeight() { return h; }

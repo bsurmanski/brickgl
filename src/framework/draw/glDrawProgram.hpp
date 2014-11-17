@@ -4,6 +4,7 @@
 #include "drawProgram.hpp"
 #include "glDrawShader.hpp"
 #include "glTexture.hpp"
+#include "glCubemap.hpp"
 
 #include "glFramebuffer.hpp"
 
@@ -35,6 +36,7 @@ class GLDrawProgram : public DrawProgram
 
     void bindStage(int stage, GLDrawShader *program);
     void bindTexture(const char *name, unsigned unit, GLTexture *texture);
+    void bindTexture(const char *name, unsigned unit, GLCubemap *texture);
     void use();
 
     void setAccum(bool b) { isAccum = b; }

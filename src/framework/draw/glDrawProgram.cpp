@@ -66,6 +66,16 @@ void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLTexture *tex)
     glUniform1i(glGetUniformLocation(id, name), unit);
 }
 
+void GLDrawProgram::bindTexture(const char *name, unsigned unit, GLCubemap *tex) {
+    unsigned tid = 0;
+    if(tex) tid = tex->getId();
+
+    glUseProgram(id);
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tid);
+    glUniform1i(glGetUniformLocation(id, name), unit);
+}
+
 void GLDrawProgram::bindStage(int stage, GLDrawShader *program)
 {
     if(shaders[stage])

@@ -2,73 +2,75 @@
 
 #include<assert.h>
 
-static int getGLFormat(int format)
+using namespace GLDraw;
+
+int GLDraw::getGLFormat(int format)
 {
     switch(format)
     {
-        case GLTexture::DEPTH24_STENCIL8:
+        case DEPTH24_STENCIL8:
             return GL_DEPTH_STENCIL;
-        case GLTexture::DEPTH32:
+        case DEPTH32:
             return GL_DEPTH_COMPONENT;
-        case GLTexture::RGBA8:
+        case RGBA8:
             return GL_RGBA;
-        case GLTexture::RGB8:
+        case RGB8:
             return GL_RGB;
-        case GLTexture::RGB10A2:
+        case RGB10A2:
             return GL_RGB;
-        case GLTexture::RGB32F:
+        case RGB32F:
             return GL_RGB;
-        case GLTexture::RGBA32F:
+        case RGBA32F:
             return GL_RGBA;
 
-        case GLTexture::RGBA8I:
+        case RGBA8I:
             return GL_RGBA;
         default:
             assert(false);
     }
 }
 
-static int getGLInternalFormat(int format)
+int GLDraw::getGLInternalFormat(int format)
 {
     switch(format)
     {
-        case GLTexture::RGBA8:
+        case RGBA8:
             return GL_RGBA8;
-        case GLTexture::RGB8:
+        case RGB8:
             return GL_RGB8;
-        case GLTexture::RGB10A2:
+        case RGB10A2:
             return GL_RGB10_A2;
-        case GLTexture::RGB32F:
+        case RGB32F:
             return GL_RGB32F;
-        case GLTexture::RGBA32F:
+        case RGBA32F:
             return GL_RGBA32F;
-        case GLTexture::DEPTH32:
+        case DEPTH32:
             return GL_DEPTH_COMPONENT32;
-        case GLTexture::DEPTH24_STENCIL8:
+        case DEPTH24_STENCIL8:
             return GL_DEPTH24_STENCIL8;
 
-        case GLTexture::RGBA8I:
+        case RGBA8I:
             return GL_RGBA8_SNORM;
         default:
             assert(false);
     }
 }
 
-static int getGLType(int format)
+int GLDraw::getGLType(int format)
 {
     switch(format)
     {
-        case GLTexture::RGBA8:
-        case GLTexture::RGB8:
-        case GLTexture::RGB10A2:
+        case RGBA8:
+        case RGB8:
+        case RGB10A2:
             return GL_UNSIGNED_BYTE;
-        case GLTexture::RGB32F:
-        case GLTexture::RGBA32F:
-        case GLTexture::DEPTH32:
-        case GLTexture::DEPTH24_STENCIL8:
+        case RGB32F:
+        case RGBA32F:
+        case DEPTH32:
+        case DEPTH24_STENCIL8:
             return GL_FLOAT;
 
-        case GLTexture::RGBA8I:
+        case RGBA8I:
             return GL_BYTE;
         default:
             assert(false);

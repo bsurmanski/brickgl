@@ -8,8 +8,16 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
+struct GLVertex;
+struct GLIndex;
+
 class GLMesh
 {
+    static GLMesh *cubeMesh;
+    static GLMesh *quadMesh;
+
+    GLMesh(GLVertex *v, int nv, GLIndex *i, int ni);
+
     public:
     GLuint vbuffer;
     GLuint ibuffer;
@@ -20,6 +28,8 @@ class GLMesh
     public:
 
     GLMesh(Mesh &m);
+    static GLMesh *getUnitCube();
+    static GLMesh *getUnitQuad();
     unsigned getNElements() { return nelem; }
 
     virtual ~GLMesh();

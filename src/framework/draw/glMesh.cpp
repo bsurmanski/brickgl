@@ -5,6 +5,9 @@
 #include <limits.h>
 #include <math.h>
 
+GLMesh *GLMesh::cubeMesh = NULL;
+GLMesh *GLMesh::quadMesh = NULL;
+
 struct IVertex
 {
     unsigned v;
@@ -69,6 +72,25 @@ GLMesh::~GLMesh()
 {
     glDeleteBuffers(1, &ibuffer);
     glDeleteBuffers(1, &vbuffer);
+}
+
+GLMesh::GLMesh(GLVertex *v, int nv, GLIndex *i, int ni) {
+    glGenBuffers(1, &ibuffer);
+    glGenBuffers(1, &vbuffer);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbuffer);
+    glBufferData(GL_ARRAY_BUFFER,
+            sizeof(GLVertex) * nv,
+            v,
+            GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            sizeof(GLIndex) * ni,
+            i,
+            GL_STATIC_DRAW);
+
+    nelem = ni * 3;
 }
 
 GLMesh::GLMesh(Mesh &m)
@@ -144,4 +166,85 @@ GLMesh::GLMesh(Mesh &m)
             GL_STATIC_DRAW);
 
     nelem = glindex.size() * 3;
+}
+
+#define P INT16_MAX
+#define N INT16_MIN
+static GLVertex unitQuadV[4] = {
+    //+Z
+    {{ 1, -1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{ 1,  1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{-1, -1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{-1,  1,  1}, {0, 0, P}, {0, 0}, 0},
+};
+
+static GLVertex unitCubeV[32] = {
+    //+X
+    {{ 1, -1, -1}, { P, 0, 0}, {0, 0}, 0},
+    {{ 1,  1, -1}, { P, 0, 0}, {0, 0}, 0},
+    {{ 1,  1,  1}, { P, 0, 0}, {0, 0}, 0},
+    {{ 1, -1,  1}, { P, 0, 0}, {0, 0}, 0},
+
+    //-X
+    {{-1, -1,  1}, { N, 0, 0}, {0, 0}, 0},
+    {{-1,  1,  1}, { N, 0, 0}, {0, 0}, 0},
+    {{-1,  1, -1}, { N, 0, 0}, {0, 0}, 0},
+    {{-1, -1, -1}, { N, 0, 0}, {0, 0}, 0},
+
+    //+Y
+    {{ 1,  1, -1}, {0, P, 0}, {0, 0}, 0},
+    {{-1,  1, -1}, {0, P, 0}, {0, 0}, 0},
+    {{-1,  1,  1}, {0, P, 0}, {0, 0}, 0},
+    {{ 1,  1,  1}, {0, P, 0}, {0, 0}, 0},
+
+    //-Y
+    {{-1, -1, -1}, {0, N, 0}, {0, 0}, 0},
+    {{ 1, -1, -1}, {0, N, 0}, {0, 0}, 0},
+    {{ 1, -1,  1}, {0, N, 0}, {0, 0}, 0},
+    {{-1, -1,  1}, {0, N, 0}, {0, 0}, 0},
+
+    //+Z
+    {{-1, -1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{ 1, -1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{ 1,  1,  1}, {0, 0, P}, {0, 0}, 0},
+    {{-1,  1,  1}, {0, 0, P}, {0, 0}, 0},
+
+    //-Z
+    {{-1, -1, -1}, {0, 0, N}, {0, 0}, 0},
+    {{ 1, -1, -1}, {0, 0, N}, {0, 0}, 0},
+    {{ 1,  1, -1}, {0, 0, N}, {0, 0}, 0},
+    {{-1,  1, -1}, {0, 0, N}, {0, 0}, 0},
+};
+#undef P
+#undef N
+
+static GLIndex unitQuadI[2] = {
+    {0, 1, 2}, {0, 2, 3},
+};
+
+static GLIndex unitCubeI[12] = {
+    {0, 1, 2}, {0, 2, 3},
+    {4, 5, 6}, {4, 6, 7},
+    {8, 9, 10}, {8, 10, 11},
+    {12, 13, 14}, {12, 14, 15},
+    {16, 17, 18}, {16, 18, 19},
+    {20, 21, 22}, {20, 22, 23}
+};
+
+#include <stdio.h>
+
+GLMesh *GLMesh::getUnitCube() {
+    if(!cubeMesh) {
+        cubeMesh = new GLMesh(unitCubeV, 32, unitCubeI, 12);
+    }
+
+    return cubeMesh;
+}
+
+GLMesh *GLMesh::getUnitQuad() {
+    if(!quadMesh) {
+        quadMesh = new GLMesh(unitQuadV, 4, unitQuadI, 2);
+    }
+
+    return quadMesh;
 }

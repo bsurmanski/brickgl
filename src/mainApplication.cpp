@@ -1,6 +1,7 @@
 #include "mainApplication.hpp"
 
 #include "io/palmIOManager.hpp"
+#include "framework/draw/pngFormat.hpp"
 #include "framework/draw/tgaFormat.hpp"
 #include "matrix.hpp"
 
@@ -11,6 +12,7 @@ MainApplication::MainApplication(int argc, char **argv) {
     isRunning = false;
     camera = NULL;
     brickMenu = NULL;
+    skybox = NULL;
     willScreenshot = false;
 }
 
@@ -21,6 +23,9 @@ void MainApplication::init() {
 
     camera = &((GLDrawDevice*)drawDevice)->camera;
     brickMenu = new BrickMenu;
+
+    Image mapimg = pngLoad("res/skybox_test.png");
+    skybox = new GLCubemap(mapimg, mapimg, mapimg, mapimg, mapimg, mapimg);
 
     Brick::init();
 }
@@ -175,6 +180,8 @@ void MainApplication::draw() {
     ((GLDrawDevice*)drawDevice)->lightBuffer->clear();
     ((GLDrawDevice*)drawDevice)->mainBuffer->clear();
 
+    ((GLDrawDevice*)drawDevice)->drawSkybox(skybox);
+
     drawBrick(Brick::flatMesh, Brick::plateTexture, vec4(-16 * 8,-8.0, -16 * 8,1), 32, 32);
     for(int i = 0; i < bricks.size(); i++)
     {
@@ -246,11 +253,13 @@ void MainApplication::run() {
 int MainApplication::save(std::string filenm) {
     PalmIOManager pio;
     pio.save(this, filenm);
+    return 0;
 }
 
 int MainApplication::load(std::string filenm) {
     PalmIOManager pio;
     pio.load(this, filenm);
+    return 0;
 }
 
 void MainApplication::screenshot(std::string filenm) {

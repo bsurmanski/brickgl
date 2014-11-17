@@ -4,6 +4,7 @@
 #include "framework/application.hpp"
 #include "framework/draw/mesh.hpp"
 #include "framework/draw/glMesh.hpp"
+#include "framework/draw/glCubemap.hpp"
 #include "brick.hpp"
 #include "brickMenu.hpp"
 #include "vector.hpp"
@@ -20,6 +21,7 @@ class MainApplication : public Application {
     Camera *camera;
     Brick* cursor;
     BrickMenu *brickMenu;
+    GLCubemap *skybox;
 
     void drawBrick(GLMesh *mesh, GLTexture *tex, vec4 pos, unsigned w, unsigned h);
     Brick *findClosestBrick(vec4 p);
