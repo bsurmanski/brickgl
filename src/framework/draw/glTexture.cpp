@@ -4,6 +4,26 @@
 
 using namespace GLDraw;
 
+int GLDraw::getFormatPixelSize(int format) {
+    switch(format)
+    {
+        case DEPTH24_STENCIL8:
+        case DEPTH32:
+        case RGBA8:
+        case RGB10A2:
+        case RGBA8I:
+            return 4;
+        case RGB8:
+            return 3;
+
+        case RGB32F:
+        case RGBA32F:
+            return 4; //XXX is this 4? or is it 16
+        default:
+            assert(false);
+    }
+}
+
 int GLDraw::getGLFormat(int format)
 {
     switch(format)

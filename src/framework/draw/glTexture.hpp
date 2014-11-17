@@ -5,6 +5,7 @@
 #include "image.hpp"
 
 namespace GLDraw {
+    int getFormatPixelSize(int format);
     int getGLFormat(int format);
     int getGLInternalFormat(int format);
     int getGLType(int format);

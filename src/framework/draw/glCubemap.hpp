@@ -16,6 +16,8 @@ class GLCubemap {
     unsigned getHeight() { return h; }
     GLuint getId() { return id; }
 
+    // cubemap image in blender single image style
+    GLCubemap(Image &cubemap);
     GLCubemap(Image &xp, Image &xn, Image &yp, Image &yn, Image &zp, Image &zn);
     GLCubemap(Image *img[6]);
 };

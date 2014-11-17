@@ -24,8 +24,8 @@ void MainApplication::init() {
     camera = &((GLDrawDevice*)drawDevice)->camera;
     brickMenu = new BrickMenu;
 
-    Image mapimg = pngLoad("res/skybox_test.png");
-    skybox = new GLCubemap(mapimg, mapimg, mapimg, mapimg, mapimg, mapimg);
+    Image skyboxImg = pngLoad("res/skybox.png");
+    skybox = new GLCubemap(skyboxImg);
 
     Brick::init();
 }
