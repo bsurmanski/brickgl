@@ -10,11 +10,14 @@
 #include "vector.hpp"
 
 #include <vector>
+#include <algorithm>
 
 class MainApplication : public Application {
     protected:
     bool isRunning;
     bool willScreenshot;
+    bool willGenInstructions;
+    bool showCursor;
 
     vec4 target;
     std::vector<Brick*> bricks;
@@ -43,6 +46,7 @@ class MainApplication : public Application {
     virtual int load(std::string filenm);
 
     virtual void screenshot(std::string filenm);
+    virtual void genInstructions(std::string folder);
 
     bool tryPlaceBrick(Brick *b);
 

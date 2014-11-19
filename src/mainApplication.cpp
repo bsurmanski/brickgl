@@ -4,6 +4,9 @@
 #include "framework/draw/pngFormat.hpp"
 #include "framework/draw/tgaFormat.hpp"
 #include "matrix.hpp"
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <float.h>
 
 MainApplication::MainApplication(int argc, char **argv) {
     drawDevice = NULL;
@@ -14,6 +17,7 @@ MainApplication::MainApplication(int argc, char **argv) {
     brickMenu = NULL;
     skybox = NULL;
     willScreenshot = false;
+    showCursor = true;
 }
 
 void MainApplication::init() {
@@ -204,7 +208,8 @@ void MainApplication::draw() {
 
 #endif
 
-    cursor->draw(drawDevice);
+    if(showCursor)
+        cursor->draw(drawDevice);
 
     ((GLDrawDevice*)drawDevice)->applyLighting();
 
@@ -222,8 +227,12 @@ void MainApplication::draw() {
     // this is here so that everything can be drawn before a screenshot
     if(willScreenshot) {
         willScreenshot = false;
-        //printf("Screenshot\n");
         screenshot("screenshot.tga");
+    }
+
+    if(willGenInstructions) {
+        willGenInstructions = false;
+        genInstructions("instructions");
     }
 
     window->swapBuffers();
@@ -260,6 +269,45 @@ int MainApplication::load(std::string filenm) {
     PalmIOManager pio;
     pio.load(this, filenm);
     return 0;
+}
+
+static bool BrickYOrder(Brick *b1, Brick *b2) {
+    return b1->position.y < b2->position.y;
+}
+
+static bool floatLTE(float f1, float f2) {
+    return (f1 - f2) < FLT_EPSILON;
+}
+
+void MainApplication::genInstructions(std::string folder) {
+    std::vector<Brick *> backup = bricks;
+    bricks.clear();
+
+    showCursor = false;
+
+    std::sort(backup.begin(), backup.end(), BrickYOrder);
+
+    mkdir(folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+    int n = 0; // image number
+    for(int i = 0; i < backup.size(); i++) {
+        bricks.push_back(backup[i]);
+
+        if(i < (backup.size() - 1) &&
+                floatLTE(backup[i+1]->position.y, backup[i]->position.y)) {
+            continue;
+        }
+
+        draw();
+        Image img = ((GLDrawDevice*)drawDevice)->screenshot();
+
+        char buf[16];
+        sprintf(buf, "%d", n);
+        outputTGA(folder + "/" + buf + ".tga", img);
+        n++;
+    }
+
+    showCursor = true;
 }
 
 void MainApplication::screenshot(std::string filenm) {

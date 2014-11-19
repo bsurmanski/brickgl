@@ -58,6 +58,16 @@ class QtApplication : public MainApplication {
         app.exec();
     }
 
+    void quickInstructions() {
+        window = new QtWindow(this, 640, 480, "BrickSim", false);
+
+        willScreenshot = true;
+        isRunning = false;
+        load("out.bpj");
+
+        app.exec();
+    }
+
     void update(float dt) {
         MainApplication::update(dt);
 
@@ -72,19 +82,25 @@ int main(int argc, char **argv)
     QtApplication app(argc, argv);
 
     bool screenshot = false;
+    bool instructions = false;
 
     int c;
     while(optind < argc) {
-        c = getopt(argc, argv, "s");
+        c = getopt(argc, argv, "sS");
         switch(c) {
             case 's':
                 screenshot = true;
+                break;
+            case 'S':
+                instructions = true;
                 break;
         }
     }
 
     if(screenshot) {
         app.quickScreenshot();
+    } else if(instructions) {
+        app.quickInstructions();
     } else {
         app.run();
     }
