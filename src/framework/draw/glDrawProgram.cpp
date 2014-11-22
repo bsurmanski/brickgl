@@ -121,15 +121,24 @@ void GLDrawProgram::drawMesh(GLMesh *mesh)
 {
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibuffer);
-    GLuint pos_uint = glGetAttribLocation(id, "position");
-    GLuint norm_uint = glGetAttribLocation(id, "normal");
-    GLuint uv_uint = glGetAttribLocation(id, "uv");
-    glEnableVertexAttribArray(pos_uint);
-    glEnableVertexAttribArray(norm_uint);
-    glEnableVertexAttribArray(uv_uint);
-    glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 24, 0);
-    glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, 24, (void*) 12);
-    glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, 24, (void*) 18);
+
+    GLint pos_uint = glGetAttribLocation(id, "position");
+    if(pos_uint >= 0) {
+        glEnableVertexAttribArray(pos_uint);
+        glVertexAttribPointer(pos_uint, 3, GL_FLOAT, GL_FALSE, 24, 0);
+    }
+
+    GLint norm_uint = glGetAttribLocation(id, "normal");
+    if(norm_uint >= 0) {
+        glEnableVertexAttribArray(norm_uint);
+        glVertexAttribPointer(norm_uint, 3, GL_SHORT, GL_TRUE, 24, (void*) 12);
+    }
+
+    GLint uv_uint = glGetAttribLocation(id, "uv");
+    if(uv_uint >= 0) {
+        glEnableVertexAttribArray(uv_uint);
+        glVertexAttribPointer(uv_uint, 2, GL_UNSIGNED_SHORT, GL_TRUE, 24, (void*) 18);
+    }
 
     glDrawElements(GL_TRIANGLES, mesh->getNElements(), GL_UNSIGNED_SHORT, 0);
 }

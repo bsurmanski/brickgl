@@ -240,6 +240,12 @@ void MainApplication::draw() {
 
 void MainApplication::update(float dt) {
     Application::update(dt);
+
+    int err;
+    if((err = glGetError())) {
+        printf("GLERROR %d\n", err);
+    }
+
     for(int i = 0; i < bricks.size(); i++)
     {
         bricks[i]->update();

@@ -241,6 +241,7 @@ void GLDrawDevice::drawSkybox(GLCubemap *tex) {
     skyboxProgram->setUniform("mMatrix", mMatrix);
     skyboxProgram->setUniform("ambient", vec4(1.0, 1.0, 1.0, 1.0));
 
+
     skyboxProgram->bindTexture("t_color", 0, tex);
 
     skyboxProgram->drawMesh(mesh);
