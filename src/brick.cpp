@@ -180,8 +180,8 @@ void Brick::disconnect(Brick *o) {
     int i = 0;
     PegInfo *pi;
     while((pi = getPegInfo(i++))) {
-        if(pi->connected && pi->connected->owner == o) {
-            pi->connected->disconnect();
+        if(pi->input && pi->input->owner == o) {
+            pi->input->disconnect();
             pi->disconnect();
         }
     }

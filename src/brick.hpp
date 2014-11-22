@@ -25,7 +25,9 @@ struct PegInfo {
         OUTPUT,
         INOUT,
         POWER,
-        GROUND
+        GROUND,
+        VCC_OUT,
+        GND_IN,
     };
 
     Brick *owner;
@@ -37,7 +39,7 @@ struct PegInfo {
     float buffer;
     float value;
 
-    PegInfo *connected;
+    PegInfo *input;
 
     PegInfo(Brick *own, PegType t, int n, int _x, int _y) {
         owner = own;
@@ -46,7 +48,7 @@ struct PegInfo {
         x = _x;
         y = _y;
         value = 0.0f;
-        connected = NULL;
+        input = NULL;
         refcount = 1;
     }
 
@@ -73,7 +75,7 @@ struct PegInfo {
                 buffer = 1.0f;
                 break;
             case INPUT:
-                if(connected) buffer = connected->value;
+                if(input) buffer = input->value;
                 else buffer = 0.0f;
                 break;
             case INOUT: //TODO: figure out them wires
@@ -103,15 +105,15 @@ struct PegInfo {
 
     bool connect(PegInfo *o) {
         if(owner == o->owner) return false; //cannot connect to self
-        if(connected) return false; // peg already connected
+        if(input) return false; // peg already connected
         if(type == INPUT && o->type == INPUT) return false; // input cannot connect to input
         if(type == OUTPUT && o->type == OUTPUT) return false; //output cannot connect to output
-        connected = o;
+        input = o; //XXX TODO: determine which one is the input
         return true;
     }
 
     void disconnect() {
-        connected = NULL;
+        input = NULL;
     }
 };
 
@@ -142,6 +144,8 @@ class Brick
             case PegInfo::INOUT: return groundTexture;
             case PegInfo::POWER: return powerTexture;
             case PegInfo::GROUND: return groundTexture;
+            case PegInfo::GND_IN: return groundTexture;
+            case PegInfo::VCC_OUT: return powerTexture;
         }
 
         return groundTexture; //ERROR, somethings wrong
@@ -231,6 +235,48 @@ class Brick
     bool collides(Brick *b2);
 
     void rotate(vec4 r) { rotation = rotation + r; }
+};
+
+class BatteryBrick : public Brick {
+    protected:
+    PegInfo *pegVcc;
+    PegInfo *pegGnd;
+
+    public:
+    BatteryBrick(vec4 position=vec4(0,0,0,1), vec4 rotation=vec4(0,0,0,0)) :
+        Brick(position, rotation) {
+            pegVcc = new PegInfo(this, PegInfo::VCC_OUT, 0, 0, 0);
+            pegGnd = new PegInfo(this, PegInfo::GND_IN, 0, 2, 0);
+        }
+
+    virtual ~BatteryBrick() {
+        pegVcc->release();
+        pegGnd->release();
+    }
+
+    virtual bool flat() { return false; }
+    Brick *copy() { return new BatteryBrick(position, rotation); }
+
+    virtual unsigned length() { return 4; }
+    virtual unsigned width() { return 2; }
+
+    virtual PegInfo *getPegInfo(int x, int y) {
+        if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL;
+        if(x < 2) return pegVcc;
+        return pegGnd;
+    }
+
+    virtual void update() {
+        pegVcc->setValue(1.0f);
+        pegGnd->setValue(0.0f);
+    }
+
+    virtual void flip() {
+        pegVcc->flip();
+        pegGnd->flip();
+    }
+
+    virtual std::string typeName() { return "battery"; }
 };
 
 class TwoInputBrick : public Brick {

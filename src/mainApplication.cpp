@@ -133,7 +133,7 @@ void MainApplication::input() {
 
     if(inputDevice->isKeyDown(KEY_4))
     {
-        //cursor = Brick(Brick::BRICK_PLATE2x4, vec4(0,0,0,1));
+        cursor = new BatteryBrick();
     }
 
     if(inputDevice->keyPressed(KEY_LEFT))
