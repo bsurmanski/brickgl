@@ -32,3 +32,5 @@ moc_*
 *.bpj
 
 screenshot.tga
+
+*.blend1

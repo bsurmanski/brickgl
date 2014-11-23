@@ -404,7 +404,43 @@ class Wire8Brick : public Brick {
         //TODO: set value of pegs
     }
 
-    virtual std::string typeName() { return "wire"; }
+    virtual std::string typeName() { return "wire8"; }
+};
+
+class Wire4Brick : public Brick {
+    PegInfo *pegWire[4];
+
+    public:
+    Wire4Brick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {
+        for(int i = 0; i < 4; i++) {
+            pegWire[i] = new PegInfo(this, PegInfo::INOUT, 0, i, 0);
+        }
+    }
+
+    virtual ~Wire4Brick() {
+        for(int i = 0; i < 4; i++)
+            pegWire[i]->release();
+    }
+
+    virtual void update() {
+        for(int i = 0; i < 4; i++) {
+            pegWire[i]->update();
+        }
+    }
+    virtual unsigned length() { return 4; }
+    virtual unsigned width() { return 1; }
+    virtual bool flat() { return false; }
+    Brick *copy() { return new Wire4Brick(position, rotation); }
+    virtual PegInfo *getPegInfo(int x, int y) {
+        if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL; // invalid
+        return pegWire[x];
+    }
+
+    virtual void flip() {
+        //TODO: set value of pegs
+    }
+
+    virtual std::string typeName() { return "wire4"; }
 };
 
 class LEDBrick : public Brick {

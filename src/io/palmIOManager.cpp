@@ -275,8 +275,12 @@ void PalmIOManager::inputBrick(PalmListElement *list, MainApplication *app) {
         b = new ORBrick(pos, rot);
     } else if (type == "led") {
         b = new LEDBrick(pos, rot);
-    } else if (type == "wire") {
+    } else if (type == "wire8") {
         b = new Wire8Brick(pos, rot);
+    } else if (type == "wire4") {
+        b = new Wire4Brick(pos, rot);
+    } else if (type == "battery") {
+        b = new BatteryBrick(pos, rot);
     }
 
     if(!b) {

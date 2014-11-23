@@ -122,7 +122,7 @@ void MainApplication::input() {
     if(inputDevice->isKeyDown(KEY_2))
     {
         delete cursor;
-        cursor = new Wire8Brick();
+        cursor = new Wire4Brick();
     }
 
     if(inputDevice->isKeyDown(KEY_3))
