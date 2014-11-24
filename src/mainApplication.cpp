@@ -17,6 +17,7 @@ MainApplication::MainApplication(int argc, char **argv) {
     brickMenu = NULL;
     skybox = NULL;
     willScreenshot = false;
+    willGenInstructions = false;
     showCursor = true;
 }
 
@@ -110,6 +111,7 @@ void MainApplication::input() {
     }
 
     if(inputDevice->keyPressed(KEY_P)) {
+        image_target = "screenshot.tga";
         willScreenshot = true;
     }
 
@@ -227,12 +229,12 @@ void MainApplication::draw() {
     // this is here so that everything can be drawn before a screenshot
     if(willScreenshot) {
         willScreenshot = false;
-        screenshot("screenshot.tga");
+        screenshot(image_target);
     }
 
     if(willGenInstructions) {
         willGenInstructions = false;
-        genInstructions("instructions");
+        genInstructions(image_target);
     }
 
     window->swapBuffers();

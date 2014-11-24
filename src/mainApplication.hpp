@@ -9,11 +9,13 @@
 #include "brickMenu.hpp"
 #include "vector.hpp"
 
+#include <string>
 #include <vector>
 #include <algorithm>
 
 class MainApplication : public Application {
     protected:
+    std::string image_target; //for screenshot or instructions
     bool isRunning;
     bool willScreenshot;
     bool willGenInstructions;

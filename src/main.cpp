@@ -48,22 +48,24 @@ class QtApplication : public MainApplication {
         app.exec();
     }
 
-    void quickScreenshot() {
+    void quickScreenshot(std::string proj, std::string sstarget) {
         window = new QtWindow(this, 640, 480, "BrickSim", false);
 
+        image_target = sstarget;
         willScreenshot = true;
         isRunning = false;
-        load("out.bpj");
+        load(proj);
 
         app.exec();
     }
 
-    void quickInstructions() {
+    void quickInstructions(std::string proj, std::string qitarget) {
         window = new QtWindow(this, 640, 480, "BrickSim", false);
 
-        willScreenshot = true;
+        image_target = qitarget;
+        willGenInstructions = true;
         isRunning = false;
-        load("out.bpj");
+        load(proj);
 
         app.exec();
     }
@@ -81,26 +83,46 @@ int main(int argc, char **argv)
 {
     QtApplication app(argc, argv);
 
-    bool screenshot = false;
-    bool instructions = false;
+    std::string screenshotTarget = "";
+    std::string instructionTarget = "";
+    std::string quickload = "";
 
     int c;
     while(optind < argc) {
-        c = getopt(argc, argv, "sS");
+        c = getopt(argc, argv, "s:S:l:");
         switch(c) {
             case 's':
-                screenshot = true;
+                screenshotTarget = optarg;
                 break;
             case 'S':
-                instructions = true;
+                instructionTarget = optarg;
+                break;
+            case 'l':
+                quickload = optarg;
+                break;
+            case '?':
+                printf("unknown argument provided\n");
+                exit(-1);
+                break;
+            case ':':
+                printf("option requires argument\n");
+                exit(-1);
                 break;
         }
     }
 
-    if(screenshot) {
-        app.quickScreenshot();
-    } else if(instructions) {
-        app.quickInstructions();
+    if(!screenshotTarget.empty()) {
+        if(quickload.empty()) {
+            printf("screenshot target requires a preloaded project: '-l\n");
+            exit(-1);
+        }
+        app.quickScreenshot(quickload, screenshotTarget);
+    } else if(!instructionTarget.empty()) {
+        if(quickload.empty()) {
+            printf("quick instruction target requires a preloaded project: '-l\n");
+            exit(-1);
+        }
+        app.quickInstructions(quickload, instructionTarget);
     } else {
         app.run();
     }

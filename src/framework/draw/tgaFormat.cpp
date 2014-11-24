@@ -1,5 +1,6 @@
 #include "tgaFormat.hpp"
 
+#include <errno.h>
 #include <ctype.h>
 #include <stdio.h>
 
@@ -51,7 +52,11 @@ TGAHeader createHeader(int w, int h) {
 
 void outputTGA(std::string filenm, Image &image) {
     TGAHeader head = createHeader(image.w, image.h);
-    FILE *file = fopen(filenm.c_str(), "wb");
+    FILE *file = fopen(filenm.c_str(), "w+b");
+    if(!file) {
+        printf("SCREENSHOT ERROR %d\n", errno);
+        exit(-1);
+    }
     fwrite(&head, sizeof(head), 1, file);
     fwrite(image.pixels, image.w*image.h*4, 1, file);
     fclose(file);
