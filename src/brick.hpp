@@ -39,7 +39,7 @@ struct PegInfo {
     float buffer;
     float value;
 
-    PegInfo *input;
+    PegInfo *connected;
 
     PegInfo(Brick *own, PegType t, int n, int _x, int _y) {
         owner = own;
@@ -48,7 +48,8 @@ struct PegInfo {
         x = _x;
         y = _y;
         value = 0.0f;
-        input = NULL;
+        buffer = 0.0f;
+        connected = NULL;
         refcount = 1;
     }
 
@@ -67,6 +68,10 @@ struct PegInfo {
     }
 
     void update() {
+        if(connected && connected->getValue() > buffer) {
+            buffer = connected->getValue();
+        }
+        /*
         switch(type) {
             case GROUND:
                 buffer = 0.0f;
@@ -75,14 +80,14 @@ struct PegInfo {
                 buffer = 1.0f;
                 break;
             case INPUT:
-                if(input) buffer = input->value;
+                if(connected) buffer = connected->value;
                 else buffer = 0.0f;
                 break;
             case INOUT: //TODO: figure out them wires
             case OUTPUT:
                 buffer = 0.0f;
                 break;
-        }
+        }*/
     }
 
     void setValue(float f) {
@@ -100,20 +105,21 @@ struct PegInfo {
 
     void flip() {
         value = buffer;
+        buffer = 0.0f;
     }
 
 
     bool connect(PegInfo *o) {
         if(owner == o->owner) return false; //cannot connect to self
-        if(input) return false; // peg already connected
-        if(type == INPUT && o->type == INPUT) return false; // input cannot connect to input
-        if(type == OUTPUT && o->type == OUTPUT) return false; //output cannot connect to output
-        input = o; //XXX TODO: determine which one is the input
+        if(connected) return false; // peg already connected
+        //if(type == INPUT && o->type == INPUT) return false; // input cannot connect to input
+        //if(type == OUTPUT && o->type == OUTPUT) return false; //output cannot connect to output
+        connected = o; //XXX TODO: determine which one is the input
         return true;
     }
 
     void disconnect() {
-        input = NULL;
+        connected = NULL;
     }
 };
 
@@ -188,6 +194,7 @@ class Brick
     bool connectPeg(int peg, Brick *o, int pego);
     void disconnect(Brick *o);
     virtual Brick *copy() = 0;
+    virtual float getValue()=0;
     virtual PegInfo *getPegInfo(int x, int y)=0;
     virtual std::string typeName()=0;
 
@@ -254,6 +261,8 @@ class BatteryBrick : public Brick {
         pegGnd->release();
     }
 
+    virtual float getValue() { return pegVcc->getValue(); }
+
     virtual bool flat() { return false; }
     Brick *copy() { return new BatteryBrick(position, rotation); }
 
@@ -305,6 +314,8 @@ class TwoInputBrick : public Brick {
         pegOut->release();
     }
 
+    virtual float getValue() { return pegOut->getValue(); }
+
     virtual unsigned length() { return 4; }
     virtual unsigned width() { return 2; }
 
@@ -321,6 +332,17 @@ class TwoInputBrick : public Brick {
             return pegOut;
         }
         return NULL;
+    }
+
+    virtual void update() {
+        pegVcc->setValue(0.0f);
+        pegGnd->setValue(0.0f);
+        pegIn0->setValue(0.0f);
+        pegIn1->setValue(0.0f);
+        pegVcc->update();
+        pegGnd->update();
+        pegIn0->update();
+        pegIn1->update();
     }
 
     virtual void flip() {
@@ -341,10 +363,8 @@ class ORBrick : public TwoInputBrick {
     Brick *copy() { return new ORBrick(position, rotation); }
 
     virtual void update() {
-        pegVcc->setValue(1.0f);
-        pegGnd->setValue(0.0f);
-        pegIn0->update();
-        pegIn1->update();
+        TwoInputBrick::update();
+
         pegOut->setValue(pegIn0->isActive() || pegIn1->isActive());
     }
 
@@ -361,87 +381,87 @@ class ANDBrick : public TwoInputBrick {
     Brick *copy() { return new ANDBrick(position, rotation); }
 
     virtual void update() {
-        pegVcc->setValue(1.0f);
-        pegGnd->setValue(0.0f);
-        pegIn0->update();
-        pegIn1->update();
+        TwoInputBrick::update();
+
         pegOut->setValue(pegIn0->isActive() && pegIn1->isActive());
     }
 
     virtual std::string typeName() { return "and"; }
 };
 
-class Wire8Brick : public Brick {
-    PegInfo *pegWire[8];
+template<unsigned N>
+class WireBrick : public Brick {
+    PegInfo *pegWire[N];
 
     public:
-    Wire8Brick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {
-        for(int i = 0; i < 8; i++) {
+    WireBrick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot)
+    {
+        for(int i = 0; i < N; i++) {
             pegWire[i] = new PegInfo(this, PegInfo::INOUT, 0, i, 0);
         }
     }
 
-    virtual ~Wire8Brick() {
-        for(int i = 0; i < 8; i++)
+    virtual ~WireBrick() {
+        for(int i = 0; i < N; i++)
             pegWire[i]->release();
     }
 
+    Brick *copy() { return new WireBrick<N>(position, rotation); }
+
+    virtual float getValue() {
+        float val = 0.0f;
+        for(unsigned i = 0; i < N; i++) {
+            if(pegWire[i]->getValue() > val) {
+                val = pegWire[i]->getValue();
+            }
+        }
+
+        return val;
+    }
+
     virtual void update() {
-        for(int i = 0; i < 8; i++) {
+        for(int i = 0; i < N; i++) {
+            pegWire[i]->setValue(0.0f);
+        }
+
+        float value = getValue();
+        for(int i = 0; i < N; i++) {
             pegWire[i]->update();
+            if(pegWire[i]->buffer > value) {
+                value = pegWire[i]->buffer;
+            }
+        }
+
+        for(int i = 0; i < N; i++) {
+            pegWire[i]->setValue(value);
         }
     }
-    virtual unsigned length() { return 8; }
-    virtual unsigned width() { return 1; }
-    virtual bool flat() { return false; }
-    Brick *copy() { return new Wire8Brick(position, rotation); }
+
+    virtual void flip() {
+        for(int i = 0; i < N; i++) {
+            pegWire[i]->flip();
+        }
+    }
+
     virtual PegInfo *getPegInfo(int x, int y) {
         if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL; // invalid
         return pegWire[x];
     }
 
-    virtual void flip() {
-        //TODO: set value of pegs
-    }
-
-    virtual std::string typeName() { return "wire8"; }
-};
-
-class Wire4Brick : public Brick {
-    PegInfo *pegWire[4];
-
-    public:
-    Wire4Brick(vec4 pos=vec4(0,0,0,1), vec4 rot=vec4(0,0,0,0)) : Brick(pos, rot) {
-        for(int i = 0; i < 4; i++) {
-            pegWire[i] = new PegInfo(this, PegInfo::INOUT, 0, i, 0);
-        }
-    }
-
-    virtual ~Wire4Brick() {
-        for(int i = 0; i < 4; i++)
-            pegWire[i]->release();
-    }
-
-    virtual void update() {
-        for(int i = 0; i < 4; i++) {
-            pegWire[i]->update();
-        }
-    }
-    virtual unsigned length() { return 4; }
+    virtual unsigned length() { return N; }
     virtual unsigned width() { return 1; }
+
     virtual bool flat() { return false; }
-    Brick *copy() { return new Wire4Brick(position, rotation); }
-    virtual PegInfo *getPegInfo(int x, int y) {
-        if(x < 0 || y < 0 || x >= length() || y >= width()) return NULL; // invalid
-        return pegWire[x];
-    }
 
-    virtual void flip() {
-        //TODO: set value of pegs
+    virtual std::string typeName() {
+        char buf[128];
+        sprintf(buf, "wire%d", N);
+        return std::string(buf);
     }
-
-    virtual std::string typeName() { return "wire4"; }
 };
+
+typedef WireBrick<8> Wire8Brick;
+typedef WireBrick<4> Wire4Brick;
 
 class LEDBrick : public Brick {
     PegInfo *pegIn0;
@@ -456,6 +476,10 @@ class LEDBrick : public Brick {
     virtual ~LEDBrick() {
         pegIn0->release();
         pegGnd->release();
+    }
+
+    virtual float getValue() {
+        return pegIn0->getValue();
     }
 
     virtual bool isActive() { return pegIn0->isActive(); }

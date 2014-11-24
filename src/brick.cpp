@@ -74,7 +74,6 @@ void Brick::init()
         powerTexture = new GLTexture(powerImage);
         groundTexture = new GLTexture(groundImage);
     }
-
 }
 
 
@@ -129,8 +128,18 @@ void Brick::draw(DrawDevice *dev)
                 mat4::getTranslation(position) *
                 mat4::getRotation(rotation) *
                 mat4::getTranslation(vec4(i * 8, 0, j * 8, 1));
+            /*
             ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
                 this->getTexture(i, j), mMat);
+                */
+
+            if(getValue() > 0.5f) {
+            ((GLDrawDevice*)dev)->drawMeshUnlit(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
+            } else {
+            ((GLDrawDevice*)dev)->drawMesh(flat() ? flatMesh : fullMesh,
+                this->getTexture(i, j), mMat);
+            }
         }
     }
 
@@ -180,8 +189,8 @@ void Brick::disconnect(Brick *o) {
     int i = 0;
     PegInfo *pi;
     while((pi = getPegInfo(i++))) {
-        if(pi->input && pi->input->owner == o) {
-            pi->input->disconnect();
+        if(pi->connected && pi->connected->owner == o) {
+            pi->connected->disconnect();
             pi->disconnect();
         }
     }
