@@ -1,7 +1,5 @@
 #include "qtWindow.hpp"
 
-#include <qt/QtOpenGL/QtOpenGL>
-
 #include "application.hpp"
 #include "input/qtInputDevice.hpp"
 

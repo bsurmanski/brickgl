@@ -23,7 +23,7 @@
 #include "framework/qtWindow.hpp"
 #include "mainApplication.hpp"
 
-#include <qt/QtWidgets/QApplication>
+#include <QtWidgets/QApplication>
 #include <vector>
 
 vec4 target;

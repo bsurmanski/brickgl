@@ -149,7 +149,7 @@ void MainApplication::input() {
     }
 
 
-    cursor->position = cursor->position + ((target - cursor->position) * 0.25f);
+    cursor->position = cursor->position + ((target - cursor->position) * 0.4f);
     if(cursor->position.distanceSq(target) > 1000 * 1000)
     {
         cursor->position = target;

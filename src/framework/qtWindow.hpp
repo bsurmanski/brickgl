@@ -5,10 +5,11 @@
 
 #include <string>
 
-#include <qt/QtGui/QtGui>
-#include <qt/QtWidgets/QMainWindow>
-#include <qt/QtWidgets/QMenuBar>
-#include <qt/QtWidgets/QFileDialog>
+#include <QtGui/QtGui>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QFileDialog>
+#include <QtOpenGL/QtOpenGL>
 
 class GLFrame;
 
